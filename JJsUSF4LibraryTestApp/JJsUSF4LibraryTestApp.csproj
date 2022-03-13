@@ -1,0 +1,14 @@
+﻿<Project Sdk="Microsoft.NET.Sdk">
+
+  <PropertyGroup>
+    <OutputType>Exe</OutputType>
+    <TargetFramework>net5.0</TargetFramework>
+    <RootNamespace>JJsUSF4LibraryTestApp</RootNamespace>
+  </PropertyGroup>
+
+  <ItemGroup>
+    <ProjectReference Include="..\..\IONET\IONET\IONET.csproj" />
+    <ProjectReference Include="..\JJsUSF4Library\JJsUSF4Library.csproj" />
+  </ItemGroup>
+
+</Project>
