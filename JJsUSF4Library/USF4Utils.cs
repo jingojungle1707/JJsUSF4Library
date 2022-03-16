@@ -388,11 +388,11 @@ namespace JJsUSF4Library
             byte[] bytes;
             using (BinaryReader br = new BinaryReader(fsSource, Encoding.ASCII)) { bytes = br.ReadBytes((int)fsSource.Length); }
 
-            if (Encoding.ASCII.GetString(ChopByteArray(bytes, 0x00, 0x04)) == "#EMZ")
+            if ((USF4Methods.FileType)ReadInt(true, 0, bytes) == USF4Methods.FileType.EMZ)
             {
                 Console.WriteLine("File looks compressed, attempting inflation...");
 
-                bytes = ChopByteArray(bytes, 0x10, bytes.Length - 0x10);
+                bytes = Slice(bytes, 0x10, bytes.Length - 0x10);
 
                 List<byte> zipbytes = bytes.ToList();
 
@@ -516,40 +516,6 @@ namespace JJsUSF4Library
             return bytes;
         }
 
-        public static void AddStringAsBytes(List<byte> targetList, string Data)
-        {
-            string checkUp = "Nothing";
-            try
-            {
-                if (Data == Environment.NewLine)
-                {
-                    targetList.Add(Convert.ToByte(Environment.NewLine));
-                    return;
-                }
-                for (int i = 0; i < Data.Length / 2; i++)
-                {
-                    string num = Data.Substring(i * 2, 2);
-                    checkUp = num;
-                    //Console.WriteLine("num:" + checkUp);
-                    int hexValue = int.Parse(num, System.Globalization.NumberStyles.HexNumber);
-                    targetList.Add(Convert.ToByte(hexValue));
-                }
-            }
-            catch (Exception up)
-            {
-                Console.WriteLine(up.Message);
-                Console.WriteLine($"Offending data:  {@checkUp}");
-            }
-        }
-
-        public static void AddCopiedBytes(List<byte> targetList, int StartOffset, int Length, byte[] Data)
-        {
-            for (int i = 0; i < Length; i++)
-            {
-                targetList.Add(Data[StartOffset + i]);
-            }
-        }
-
         public static void AddFloatAsBytes(List<byte> targetList, float Data)
         {
             targetList.AddRange(BitConverter.GetBytes(Data));
@@ -575,23 +541,6 @@ namespace JJsUSF4Library
         public static void AddSignedShortAsBytes(List<byte> targetList, int Data)
         {
             targetList.AddRange(BitConverter.GetBytes((short)Data));
-        }
-
-        public static void AddCharsAsBytes(List<byte> targetList, string Data)
-        {
-            char[] Chars = Data.ToCharArray();
-            foreach (char c in Chars)
-            {
-                targetList.Add(Convert.ToByte(c));
-            }
-        }
-
-        public static void AddAllBytes(List<byte> targetList, List<byte> sourceList)
-        {
-            foreach (byte o in sourceList)
-            {
-                targetList.Add(o);
-            }
         }
 
         public static List<byte> UpdateIntAtPosition(List<byte> targetList, int Position, int newValue)
@@ -709,20 +658,6 @@ namespace JJsUSF4Library
             return ReturnValue;
         }
 
-        public static uint ReadInt(bool IsLong, uint Offset, byte[] Data)
-        {
-            uint ReturnValue;
-            if (IsLong)
-            {
-                ReturnValue = BitConverter.ToUInt32(new byte[] { Data[Offset], Data[Offset + 1], Data[Offset + 2], Data[Offset + 3] }, 0);
-            }
-            else
-            {
-                ReturnValue = BitConverter.ToUInt16(new byte[] { Data[Offset], Data[Offset + 1] }, 0);
-            }
-            //Console.WriteLine(ReturnValue);
-            return ReturnValue;
-        }
         public static void ReadToNextNonNullByte(int Offset, byte[] Data, out int EndOffset, out int ByteValue)
         {
             ByteValue = 0;
@@ -739,31 +674,12 @@ namespace JJsUSF4Library
             }
         }
 
-        public static int ReadSignedShort(int Offset, byte[] Data)
-        {
-            int ReturnValue = BitConverter.ToInt16(Data, Offset);
-
-            return ReturnValue;
-        }
-
         public static float ReadFloat(int Offset, byte[] Data)
         {
             float ReturnValue;
             float HexFloat;
             HexFloat = BitConverter.ToSingle(Data, Offset);
             ReturnValue = HexFloat;
-            return ReturnValue;
-        }
-        public static float ReadFloat(uint Offset, byte[] Data)
-        {
-            float ReturnValue;
-            ReturnValue = BitConverter.ToSingle(new byte[] { Data[Offset], Data[Offset + 1], Data[Offset + 2], Data[Offset + 3] }, 0);
-            return ReturnValue;
-        }
-        public static string ReadString(int Offset, int Length, byte[] Data) //TODO something ????!!!???
-        {
-            string ReturnValue;
-            ReturnValue = Data[Offset].ToString("X");
             return ReturnValue;
         }
 
@@ -847,16 +763,6 @@ namespace JJsUSF4Library
                 res[i] = source[i + start];
             }
             return res;
-        }
-
-        public static byte[] ChopByteArray(byte[] source, int StartOffset, int Length)
-        {
-            byte[] chop = new byte[Length];
-            for (int i = 0; i < Length; i++)
-            {
-                chop[i] = source[StartOffset + i];
-            }
-            return chop;
         }
         #endregion Binary Methods
     }

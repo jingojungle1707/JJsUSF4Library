@@ -1,5 +1,4 @@
-﻿using IONET.Core;
-using JJsUSF4Library;
+﻿using JJsUSF4Library;
 using JJsUSF4Library.FileClasses;
 using JJsUSF4Library.FileClasses.ScriptClasses;
 using JJsUSF4Library.FileClasses.SubfileClasses;
@@ -15,35 +14,6 @@ namespace JJsUSF4LibraryTestApp
     {
         static void Main(string[] args)
         {
-            #region ionet test code
-
-            string tbInputDirectory = $"D:\\Program Files (x86)\\Steam\\steamapps\\common\\Super Street Fighter IV - Arcade Edition\\resource\\battle\\chara\\SKR\\";
-            string tbOutputDirectory = $"D:\\Program Files (x86)\\Steam\\steamapps\\common\\Super Street Fighter IV - Arcade Edition\\patch_ae2_tu3\\battle\\chara\\SKR\\";
-            string tbColladaDirectory = $"C:\\Users\\Durandal\\Desktop\\SF4\\Import Export Test Directory\\";
-
-            EMO emo = (EMO)USF4Utils.OpenFileStreamCheckCompression(tbInputDirectory + "SKR_03.obj.emo");
-
-            IOScene ioS = IONET.IOManager.LoadScene(tbColladaDirectory + "sak_03_bigjersey.dae", new IONET.ImportSettings());
-
-            emo.EMGs.Add(Collada_import_test.GenerateEMGfromIOMesh(ioS.Models[0].Meshes[0], emo));
-
-            using (MemoryStream ms = new MemoryStream(emo.GenerateBytes()))
-            {
-                using (BinaryReader br = new BinaryReader(ms))
-                {
-                    emo.ReadFromStream(br);
-                }
-            }
-
-            emo.SaveFile(tbOutputDirectory + "SKR_03.obj.emo");
-
-            //TODO verify this works...
-            emo.SaveAsSFxTEMO(tbOutputDirectory + "SKR_03_SFxT.obj.emo");
-
-            #endregion
-
-
-
 
             string emzString = $"D:\\Program Files (x86)\\Steam\\steamapps\\common\\Super Street Fighter IV - Arcade Edition\\resource\\battle\\stage\\RVR.vfx.emz";
 

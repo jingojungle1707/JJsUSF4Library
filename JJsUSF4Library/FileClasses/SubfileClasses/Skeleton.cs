@@ -194,8 +194,7 @@ namespace JJsUSF4Library.FileClasses.SubfileClasses
             USF4Utils.UpdateIntAtPosition(Data, registerPointerPosition, Data.Count);
             for (int i = 0; i < FFList.Count; i++)
             {
-                //Data.AddRange(new byte[] { 0x00,0x00,0x00,0x00,0xFF,0xFF,0x00,0x00});
-                USF4Utils.AddCopiedBytes(Data, 0x00, FFList[i].Length, FFList[i]);
+                Data.AddRange(FFList[i]);
             }
             //Node Name Index
             USF4Utils.UpdateIntAtPosition(Data, nameIndexPointerPosition, Data.Count);
