@@ -31,5 +31,20 @@ namespace JJsUSF4Library.FileClasses.ScriptClasses
             UnkShort5_0x0A = br.ReadInt16();
             StorageIndex = br.ReadInt32();
         }
+
+        public List<byte> GenerateBytes()
+        {
+            List<byte> data = new List<byte>();
+
+            USF4Utils.AddIntAsBytes(data, Input, false);
+            USF4Utils.AddIntAsBytes(data, UnkShort1_0x02, false);
+            USF4Utils.AddIntAsBytes(data, MoveFlags, false);
+            USF4Utils.AddIntAsBytes(data, Frames, false);
+            USF4Utils.AddIntAsBytes(data, UnkShort4_0x08, false);
+            USF4Utils.AddIntAsBytes(data, UnkShort5_0x0A, false);
+            USF4Utils.AddIntAsBytes(data, StorageIndex, false);
+
+            return data;
+        }
     }
 }

@@ -122,6 +122,10 @@ namespace JJsUSF4Library.FileClasses
             return Data.ToArray();
         }
 
+        /// <summary>
+        /// Alternate byte generation using SFxT .emo layout (Vertex block at end of file)
+        /// </summary>
+        /// <returns></returns>
         public byte[] GenerateSFxTBytes()
         {
             //SFxT style 
@@ -186,7 +190,6 @@ namespace JJsUSF4Library.FileClasses
             {
                 for (int j = 0; j < EMGs[i].Models.Count; j++)
                 {
-                    //-0x14 because we want to measure from the start of the model header
                     USF4Utils.UpdateIntAtPosition(data, vertexPointerPositions[i][j], data.Count - vertexPointerPositions[i][j] + 0x14);
 
                     data.AddRange(EMGs[i].Models[j].GenerateVertexBytes(Skeleton.NodeNames));

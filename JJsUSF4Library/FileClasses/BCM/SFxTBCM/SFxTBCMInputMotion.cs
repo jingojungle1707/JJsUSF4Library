@@ -68,6 +68,8 @@ namespace JJsUSF4Library.FileClasses.ScriptClasses
             }
             public InputDetail(BinaryReader br, int offset = 0)
             {
+                br.BaseStream.Seek(offset, SeekOrigin.Begin);
+
                 InputCount = br.ReadInt16();
 
                 Type = new List<int>();

@@ -54,6 +54,8 @@ namespace JJsUSF4Library.FileClasses.ScriptClasses
 
         public USF4BCMMove(BinaryReader br, string name, int offset = 0)
         {
+            br.BaseStream.Seek(offset, SeekOrigin.Begin);
+
             Name = name;
             //Length 0x54
             Input = br.ReadInt16();
@@ -93,6 +95,51 @@ namespace JJsUSF4Library.FileClasses.ScriptClasses
             //0x50
             CPUVsFar = br.ReadInt16();
             CPUVsVeryFar = br.ReadInt16();
+        }
+
+        public List<byte> GenerateBytes()
+        {
+            List<byte> data = new List<byte>();
+
+            USF4Utils.AddIntAsBytes(data, Input, false);
+            USF4Utils.AddIntAsBytes(data, MoveFlags, false);
+            USF4Utils.AddIntAsBytes(data, PositionRestriction, false);
+            USF4Utils.AddIntAsBytes(data, Restriction, true);
+            USF4Utils.AddIntAsBytes(data, StateRestriction, false);
+            USF4Utils.AddIntAsBytes(data, MiscRestriction, true);
+            //0x10
+            USF4Utils.AddIntAsBytes(data, UltraRestriction, true);
+            USF4Utils.AddFloatAsBytes(data, PositionRestrictionDistance);
+            USF4Utils.AddIntAsBytes(data, EXRequirement, false);
+            USF4Utils.AddIntAsBytes(data, EXCost, false);
+            USF4Utils.AddIntAsBytes(data, UltraRequirement, false);
+            USF4Utils.AddIntAsBytes(data, UltraCost, false);
+            //0x20
+            USF4Utils.AddIntAsBytes(data, InputMotion, true);
+            USF4Utils.AddIntAsBytes(data, Script, true);
+            USF4Utils.AddIntAsBytes(data, Features, true);
+            USF4Utils.AddFloatAsBytes(data, CPUMinRange);
+            //0x30
+            USF4Utils.AddFloatAsBytes(data, CPUMaxRange);
+            USF4Utils.AddIntAsBytes(data, UnkLong_0x34, true);
+            USF4Utils.AddIntAsBytes(data, UnkShort_0x38, false);
+            USF4Utils.AddIntAsBytes(data, CPUPassiveMove, false);
+            USF4Utils.AddIntAsBytes(data, CPUCounterMove, false);
+            USF4Utils.AddIntAsBytes(data, CPUVsStand, false);
+            //0x40
+            USF4Utils.AddIntAsBytes(data, CPUVsCrouch, false);
+            USF4Utils.AddIntAsBytes(data, CPUVsAir, false);
+            USF4Utils.AddIntAsBytes(data, CPUVsDown, false);
+            USF4Utils.AddIntAsBytes(data, CPUVsStunned, false);
+            USF4Utils.AddIntAsBytes(data, CPUProbeMove, false);
+            USF4Utils.AddIntAsBytes(data, CPUVsVeryClose, false);
+            USF4Utils.AddIntAsBytes(data, CPUVsClose, false);
+            USF4Utils.AddIntAsBytes(data, CPUVsMidRange, false);
+            //0x50
+            USF4Utils.AddIntAsBytes(data, CPUVsFar, false);
+            USF4Utils.AddIntAsBytes(data, CPUVsVeryFar, false);
+
+            return data;
         }
     }
 }
