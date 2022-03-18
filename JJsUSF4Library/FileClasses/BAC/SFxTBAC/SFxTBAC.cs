@@ -8,8 +8,8 @@ namespace JJsUSF4Library.FileClasses
 {
     public class SFxTBAC : BAC
     {
-        List<ScriptFile> ScriptFiles;
-        List<HitEffect> HitEffects;
+        public List<ScriptFile> ScriptFiles;
+        public List<HitEffect> HitEffects;
 
         public SFxTBAC()
         {

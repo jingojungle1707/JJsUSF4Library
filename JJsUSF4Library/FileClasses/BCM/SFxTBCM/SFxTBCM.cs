@@ -1,4 +1,5 @@
 ﻿using JJsUSF4Library.FileClasses.ScriptClasses;
+using System;
 using System.Collections.Generic;
 using System.IO;
 using System.Linq;
@@ -14,6 +15,29 @@ namespace JJsUSF4Library.FileClasses
         public List<SFxTBCMCancel> Cancels;
 
         public List<string> NameIndex;
+
+        [Flags]
+        public enum Inputs
+        {
+            UNK0 = 0x00,
+            UP = 0x01,
+            DOWN = 0x02,
+            BACK = 0x04,
+            FORWARD = 0x08,
+            LP = 0x10,
+            MP = 0x20,
+            HP = 0x40,
+            LK = 0x80,
+            MK = 0x100,
+            HK = 0x200,
+            UNK1 = 0x400,
+            SELECT = 0x800,
+            NEUTRAL = 0x1000,
+            UNK4 = 0x2000,
+            UNK5 = 0x4000,
+            UNK6 = 0x8000,
+            NONE = 0xFFFF
+        }
 
         //Header data
         //23 42 43 4D FE FF 4C 00 00 00 00 00
@@ -186,7 +210,7 @@ namespace JJsUSF4Library.FileClasses
                 if (movePointers[i] == 0) Moves.Add(new SFxTBCMMove());
                 else
                 {
-                    Moves.Add(new SFxTBCMMove(br, moveNames[i], offset + movePointers[i]));
+                    Moves.Add(new SFxTBCMMove(br, moveNames[i], inputNames, offset + movePointers[i]));
                 }
             }
             for (int i = 0; i < cancelCount; i++)
@@ -275,7 +299,7 @@ namespace JJsUSF4Library.FileClasses
                 //Fetch name
                 NameIndex.Add(Encoding.ASCII.GetString(USF4Utils.ReadZeroTermStringToArray(moveNamePointers[i], Data, Data.Length)));
                 //Read datablock
-                Moves.Add(new SFxTBCMMove(Data.Slice(movePointers[i], 0x40), NameIndex.Last()));
+                Moves.Add(new SFxTBCMMove(Data.Slice(movePointers[i], 0x40),NameIndex.Last(), InputMotions.Select(o => o.Name).ToList()));
             }
             for (int i = 0; i < cancelCount; i++)
             {
@@ -400,12 +424,12 @@ namespace JJsUSF4Library.FileClasses
             for (int i = 0; i < Charges.Count; i++)
             {
                 USF4Utils.UpdateIntAtPosition(Data, chargeIndexPositions[i], Data.Count);
-                USF4Utils.AddIntAsBytes(Data, Charges[i].Input, false);
+                USF4Utils.AddIntAsBytes(Data, (int)Charges[i].Input, false);
                 USF4Utils.AddIntAsBytes(Data, Charges[i].Flags, false);
                 USF4Utils.AddIntAsBytes(Data, Charges[i].UnkShort2_0x04, false);
                 USF4Utils.AddIntAsBytes(Data, Charges[i].UnkShort3_0x06, false);
                 USF4Utils.AddIntAsBytes(Data, Charges[i].ChargeTime, false);
-                USF4Utils.AddIntAsBytes(Data, Charges[i].UnkShort5_0x0A, false);
+                USF4Utils.AddIntAsBytes(Data, Charges[i].LossTime, false);
                 USF4Utils.AddIntAsBytes(Data, Charges[i].StorageIndex, false);
                 USF4Utils.AddIntAsBytes(Data, Charges[i].UnkShort7_0x0E, false);
             }
@@ -427,7 +451,7 @@ namespace JJsUSF4Library.FileClasses
                     {
                         USF4Utils.AddIntAsBytes(Data, InputMotions[i].InputDetails[j].Type[k], true);
                         USF4Utils.AddIntAsBytes(Data, InputMotions[i].InputDetails[j].Buffer[k], false);
-                        USF4Utils.AddIntAsBytes(Data, InputMotions[i].InputDetails[j].Input[k], false);
+                        USF4Utils.AddIntAsBytes(Data, (int)InputMotions[i].InputDetails[j].Input[k], false);
                         USF4Utils.AddIntAsBytes(Data, InputMotions[i].InputDetails[j].MoveFlags[k], false);
                         USF4Utils.AddIntAsBytes(Data, InputMotions[i].InputDetails[j].Flags[k], true);
                         USF4Utils.AddIntAsBytes(Data, InputMotions[i].InputDetails[j].Requirement[k], false);
@@ -439,9 +463,9 @@ namespace JJsUSF4Library.FileClasses
             for (int i = 0; i < Moves.Count; i++)
             {
                 USF4Utils.UpdateIntAtPosition(Data, moveIndexPositions[i], Data.Count);
-                USF4Utils.AddIntAsBytes(Data, Moves[i].Input, false);
-                USF4Utils.AddIntAsBytes(Data, Moves[i].InputFlags, false);
-                USF4Utils.AddIntAsBytes(Data, Moves[i].PositionRestriction, false);
+                USF4Utils.AddIntAsBytes(Data, (int)Moves[i].Input, false);
+                USF4Utils.AddIntAsBytes(Data, (int)Moves[i].InputFlags, false);
+                USF4Utils.AddIntAsBytes(Data, (int)Moves[i].PositionRestriction, false);
                 USF4Utils.AddIntAsBytes(Data, Moves[i].UnkShort3_0x06, false);
                 USF4Utils.AddIntAsBytes(Data, Moves[i].UnkShort4_0x08, false);
                 USF4Utils.AddIntAsBytes(Data, Moves[i].UnkShort5_0x0A, false);
@@ -453,7 +477,8 @@ namespace JJsUSF4Library.FileClasses
                 USF4Utils.AddIntAsBytes(Data, Moves[i].UnkShort10_0x16, false);
                 USF4Utils.AddIntAsBytes(Data, Moves[i].MeterReq, false);
                 USF4Utils.AddIntAsBytes(Data, Moves[i].MeterLoss, false);
-                USF4Utils.AddIntAsBytes(Data, Moves[i].InputMotion, false);
+                int inputMotion = InputMotions.Select(o => o.Name).ToList().IndexOf(Moves[i].InputMotion);
+                USF4Utils.AddIntAsBytes(Data, inputMotion, false);
                 USF4Utils.AddIntAsBytes(Data, Moves[i].Script, false);
                 //0x20
                 Data.Add(Moves[i].UnkByte15_0x20);
@@ -478,7 +503,7 @@ namespace JJsUSF4Library.FileClasses
             //Write cancels
             List<int> CancellableMovePointerPositions = new List<int>();
             List<int> CancelFlagsPointerPositions = new List<int>();
-            int CancelIndexPosition = Data.Count();
+            int CancelIndexPosition = Data.Count;
             for (int i = 0; i < Cancels.Count; i++)
             {
                 //If we don't have any data, null the pointer

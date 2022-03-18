@@ -61,9 +61,9 @@ namespace JJsUSF4Library.FileClasses.ScriptClasses
         public class InputDetail
         {
             public int
+                Input,
                 Type,
                 Buffer,
-                Input,
                 MoveFlags,
                 Flags,
                 Requirement;

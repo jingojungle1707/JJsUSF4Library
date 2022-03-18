@@ -54,10 +54,11 @@ namespace JJsUSF4Library.FileClasses.ScriptClasses
                 InputCount; //Short
 
             //Each input is length 0x10
+            public List<SFxTBCM.Inputs> Input; //Long
             public List<int>
-                Type, //Long
+                Type,
                 Buffer, //Short
-                Input, //Short
+                //Input, //Short
                 MoveFlags, //Short
                 Flags, //Long
                 Requirement; //Short
@@ -74,7 +75,7 @@ namespace JJsUSF4Library.FileClasses.ScriptClasses
 
                 Type = new List<int>();
                 Buffer = new List<int>();
-                Input = new List<int>();
+                Input = new List<SFxTBCM.Inputs>();
                 MoveFlags = new List<int>();
                 Flags = new List<int>();
                 Requirement = new List<int>();
@@ -83,7 +84,7 @@ namespace JJsUSF4Library.FileClasses.ScriptClasses
                 {
                     Type.Add(br.ReadInt32());
                     Buffer.Add(br.ReadInt16());
-                    Input.Add(br.ReadInt16());
+                    Input.Add((SFxTBCM.Inputs)br.ReadInt16());
                     MoveFlags.Add(br.ReadInt16());
                     Flags.Add(br.ReadInt32());
                     Requirement.Add(br.ReadInt16());
@@ -95,7 +96,7 @@ namespace JJsUSF4Library.FileClasses.ScriptClasses
 
                 Type = new List<int>();
                 Buffer = new List<int>();
-                Input = new List<int>();
+                Input = new List<SFxTBCM.Inputs>();
                 MoveFlags = new List<int>();
                 Flags = new List<int>();
                 Requirement = new List<int>();
@@ -104,7 +105,7 @@ namespace JJsUSF4Library.FileClasses.ScriptClasses
                 {
                     Type.Add(USF4Utils.ReadInt(true, 0x02 + i * 0x10, Data));
                     Buffer.Add(USF4Utils.ReadInt(false, 0x06 + i * 0x10, Data));
-                    Input.Add(USF4Utils.ReadInt(false, 0x08 + i * 0x10, Data));
+                    Input.Add((SFxTBCM.Inputs)USF4Utils.ReadInt(false, 0x08 + i * 0x10, Data));
                     MoveFlags.Add(USF4Utils.ReadInt(false, 0x0A + i * 0x10, Data));
                     Flags.Add(USF4Utils.ReadInt(true, 0x0C + i * 0x10, Data));
                     Requirement.Add(USF4Utils.ReadInt(false, 0x10 + i * 0x10, Data));

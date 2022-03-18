@@ -35,6 +35,11 @@ namespace JJsUSF4Library.FileClasses.ScriptClasses
         public List<OffsetCommand> OffsetCommands;
         public List<HitEffectParam> HitEffectParams;
 
+        public HitEffectData()
+        {
+
+        }
+
         public HitEffectData(BinaryReader br, int offset = 0)
         {
             br.BaseStream.Seek(offset, SeekOrigin.Begin);

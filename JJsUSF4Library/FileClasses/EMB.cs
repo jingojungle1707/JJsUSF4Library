@@ -4,6 +4,9 @@ using System.Text;
 
 namespace JJsUSF4Library.FileClasses
 {
+    /// <summary>
+    /// Binary archive file. Acts as a wrapper for a list of other files, which can include nested EMB
+    /// </summary>
     public class EMB : USF4File
     {
         public List<USF4File> Files;
@@ -127,56 +130,55 @@ namespace JJsUSF4Library.FileClasses
 
         public override byte[] GenerateBytes()
         {
-            List<byte> Data = new List<byte>();
+            List<byte> data = new List<byte>();
             List<int> filePointerPositions = new List<int>();
             List<int> fileLengthPositions = new List<int>();
             List<int> fileNamePointerPositions = new List<int>();
-            Data.AddRange(new byte[] { 0x23, 0x45, 0x4D, 0x42, 0xFE, 0xFF, 0x20, 0x00, 0x01, 0x00, 0x01, 0x00 });
-            USF4Utils.AddIntAsBytes(Data, Files.Count, true);
-            USF4Utils.AddPaddingZeros(Data, 0x18, Data.Count);
-            int fileListPointerPosition = Data.Count;
-            USF4Utils.AddIntAsBytes(Data, -1, true);
-            int fileNameListPointerPosition = Data.Count;
-            USF4Utils.AddIntAsBytes(Data, -1, true);
+            data.AddRange(new byte[] { 0x23, 0x45, 0x4D, 0x42, 0xFE, 0xFF, 0x20, 0x00, 0x01, 0x00, 0x01, 0x00 });
+            USF4Utils.AddIntAsBytes(data, Files.Count, true);
+            USF4Utils.AddPaddingZeros(data, 0x18, data.Count);
+            int fileListPointerPosition = data.Count;
+            USF4Utils.AddIntAsBytes(data, -1, true);
+            int fileNameListPointerPosition = data.Count;
+            USF4Utils.AddIntAsBytes(data, -1, true);
 
-            USF4Utils.UpdateIntAtPosition(Data, fileListPointerPosition, Data.Count);
+            USF4Utils.UpdateIntAtPosition(data, fileListPointerPosition, data.Count);
             for (int i = 0; i < Files.Count; i++)
             {
-                filePointerPositions.Add(Data.Count);
-                USF4Utils.AddIntAsBytes(Data, -1, true);
-                fileLengthPositions.Add(Data.Count);
-                USF4Utils.AddIntAsBytes(Data, -1, true);
+                filePointerPositions.Add(data.Count);
+                USF4Utils.AddIntAsBytes(data, -1, true);
+                fileLengthPositions.Add(data.Count);
+                USF4Utils.AddIntAsBytes(data, -1, true);
             }
 
-            USF4Utils.UpdateIntAtPosition(Data, fileNameListPointerPosition, Data.Count);
+            USF4Utils.UpdateIntAtPosition(data, fileNameListPointerPosition, data.Count);
 
             for (int i = 0; i < Files.Count; i++)
             {
-                fileNamePointerPositions.Add(Data.Count);
-                USF4Utils.AddIntAsBytes(Data, -1, true);
+                fileNamePointerPositions.Add(data.Count);
+                USF4Utils.AddIntAsBytes(data, -1, true);
             }
 
-            USF4Utils.AddZeroToLineEnd(Data);
+            USF4Utils.AddZeroToLineEnd(data);
 
             for (int i = 0; i < Files.Count; i++)
             {
                 byte[] bytes = Files[i].GenerateBytes();
-                USF4File file = Files[i];
-                USF4Utils.UpdateIntAtPosition(Data, filePointerPositions[i], Data.Count - (0x20 + i * 8));
-                USF4Utils.UpdateIntAtPosition(Data, fileLengthPositions[i], bytes.Length);
-                Data.AddRange(bytes);
+                USF4Utils.UpdateIntAtPosition(data, filePointerPositions[i], data.Count - (0x20 + i * 8));
+                USF4Utils.UpdateIntAtPosition(data, fileLengthPositions[i], bytes.Length);
+                data.AddRange(bytes);
 
-                USF4Utils.AddZeroToLineEnd(Data);
+                USF4Utils.AddZeroToLineEnd(data);
             }
 
             for (int i = 0; i < FileNames.Count; i++)
             {
-                USF4Utils.UpdateIntAtPosition(Data, fileNamePointerPositions[i], Data.Count);
-                Data.AddRange(Encoding.ASCII.GetBytes(Files[i].Name));
-                Data.Add(0x00);
+                USF4Utils.UpdateIntAtPosition(data, fileNamePointerPositions[i], data.Count);
+                data.AddRange(Encoding.ASCII.GetBytes(Files[i].Name));
+                data.Add(0x00);
             }
 
-            return Data.ToArray();
+            return data.ToArray();
         }
         public override void DeleteSubfile(int index)
         {

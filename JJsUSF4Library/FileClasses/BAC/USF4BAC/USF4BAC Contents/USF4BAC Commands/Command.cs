@@ -98,27 +98,26 @@ namespace JJsUSF4Library.FileClasses.SubfileClasses
             return Data.ToArray();
         }
 
-
-
-        public CommandDatablock FetchDataBlock(COMMANDTYPE type)
+        public static CommandDatablock FetchDataBlock(COMMANDTYPE type)
         {
-            switch (type)
+            return type switch
             {
-                case COMMANDTYPE.Flow: return new CommandDatablock.FlowCommand();
-                case COMMANDTYPE.Animation: return new CommandDatablock.AnimationCommand();
-                case COMMANDTYPE.Transition: return new CommandDatablock.TransitionCommand();
-                case COMMANDTYPE.State: return new CommandDatablock.StateCommand();
-                case COMMANDTYPE.Speed: return new CommandDatablock.SpeedCommand();
-                case COMMANDTYPE.Physics: return new CommandDatablock.PhysicsCommand();
-                case COMMANDTYPE.Cancels: return new CommandDatablock.CancelCommand();
-                case COMMANDTYPE.Hitbox: return new CommandDatablock.HitboxCommand();
-                case COMMANDTYPE.Invinc: return new CommandDatablock.InvincCommand();
-                case COMMANDTYPE.Hurtbox: return new CommandDatablock.HurtboxCommand();
-                case COMMANDTYPE.ETC: return new CommandDatablock.ETCCommand();
-                case COMMANDTYPE.Targetlock: return new CommandDatablock.TargetlockCommand();
-                case COMMANDTYPE.SFX: return new CommandDatablock.SFXCommand();
-                default: return new CommandDatablock();
-            }
+                COMMANDTYPE.Flow => new CommandDatablock.FlowCommand(),
+                COMMANDTYPE.Animation => new CommandDatablock.AnimationCommand(),
+                COMMANDTYPE.Transition => new CommandDatablock.TransitionCommand(),
+                COMMANDTYPE.State => new CommandDatablock.StateCommand(),
+                COMMANDTYPE.Speed => new CommandDatablock.SpeedCommand(),
+                COMMANDTYPE.Physics => new CommandDatablock.PhysicsCommand(),
+                COMMANDTYPE.Cancels => new CommandDatablock.CancelCommand(),
+                COMMANDTYPE.Hitbox => new CommandDatablock.HitboxCommand(),
+                COMMANDTYPE.Invinc => new CommandDatablock.InvincCommand(),
+                COMMANDTYPE.Hurtbox => new CommandDatablock.HurtboxCommand(),
+                COMMANDTYPE.ETC => new CommandDatablock.ETCCommand(),
+                COMMANDTYPE.Targetlock => new CommandDatablock.TargetlockCommand(),
+                COMMANDTYPE.SFX => new CommandDatablock.SFXCommand(),
+                COMMANDTYPE.UNKNOWN => new CommandDatablock(),
+                _ => new CommandDatablock(),
+            };
         }
     }
 }

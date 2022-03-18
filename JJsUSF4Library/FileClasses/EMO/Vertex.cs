@@ -31,7 +31,7 @@ namespace JJsUSF4Library.FileClasses.SubfileClasses
         {
 
         }
-        public Vertex(BinaryReader br, int bitFlag, List<string> boneMap = default(List<string>))
+        public Vertex(BinaryReader br, int bitFlag)
         {
             BoneIDWeightPairs = new List<BoneIDWeightPair>();
 

@@ -1,4 +1,4 @@
-﻿using System.Collections.Generic;
+﻿using System;
 using System.IO;
 using JJsUSF4Library.FileClasses;
 
@@ -6,26 +6,37 @@ namespace JJsUSF4Library
 {
     public static class USF4Methods
     {
-        public static Dictionary<int, int> GetModelFlag = new Dictionary<int, int>
+        /// <summary>
+        /// Bitflag declaring what vertex data is contained in this model's vertex block
+        /// </summary>
+        [Flags]
+        public enum ModeFlag
         {
-            { 0x14, 0x0005 },
-            { 0x18, 0x0045 },
-            { 0x20, 0x0007 },
-            { 0x24, 0x0047 },
-            { 0x28, 0x0203 },
-            { 0x34, 0x0247 },
-            { 0x40, 0x02C7 },
-        };
-        public static Dictionary<int, int> GetModelBitDepth = new Dictionary<int, int>
-        {
-            { 0x0005, 0x14 },
-            { 0x0045, 0x18 },
-            { 0x0007, 0x20 },
-            { 0x0047, 0x24 },
-            { 0x0203, 0x28 },
-            { 0x0247, 0x34 },
-            { 0x02C7, 0x40 }
-        };
+            /// <summary>
+            /// Length 0x0C
+            /// </summary>
+            POSITION = 0x01,
+            /// <summary>
+            /// Length 0x0C
+            /// </summary>
+            NORMAL = 0x02,
+            /// <summary>
+            /// Lengh 0x08
+            /// </summary>
+            UV = 0x04,
+            /// <summary>
+            /// Length 0x04
+            /// </summary>
+            COLOR = 0x40,
+            /// <summary>
+            /// Length 0x0C
+            /// </summary>
+            TANGENT = 0x80,
+            /// <summary>
+            /// Length 0x10
+            /// </summary>
+            BONEWEIGHT = 0x200
+        }
 
         public enum FileType
         {
@@ -73,128 +84,46 @@ namespace JJsUSF4Library
             return fv;
         }
 
-        public static USF4File CheckFile(byte[] Data)
-        {
-            USF4File uf = CheckFile(USF4Utils.ReadInt(true, 0x00, Data));
-
-            if (uf.GetType() == typeof(BAC))
-            {
-                uf = CheckBACFileVersion(USF4Utils.ReadInt(false, 0x06, Data));
-            }
-            if (uf.GetType() == typeof(BCM))
-            {
-                uf = CheckBCMFileVersion(USF4Utils.ReadInt(false, 0x06, Data));
-            }
-
-            return uf;
-        }
         public static USF4File FetchClass(FileType ft)
         {
-            switch (ft)
+            return ft switch
             {
-                case FileType.CSB:
-                    return new CSB();
-                case FileType.EMZ:
-                    return new EMZ();
-                case FileType.EMA:
-                    return new EMA();
-                case FileType.EMB:
-                    return new EMB();
-                case FileType.EMG:
-                    return new EMG();
-                case FileType.EMM:
-                    return new EMM();
-                case FileType.EMO:
-                    return new EMO();
-                case FileType.LUA:
-                    return new LUA();
-                case FileType.DDS:
-                    return new DDS();
-                case FileType.BSR:
-                    return new BSR();
-                case FileType.RY2:
-                    return new RY2();
-                case FileType.BAC:
-                    return new BAC();
-                case FileType.BCM:
-                    return new BCM();
-                default:
-                    return new OtherFile();
-            }
+                FileType.CSB => new CSB(),
+                FileType.EMZ => new EMZ(),
+                FileType.EMA => new EMA(),
+                FileType.EMB => new EMB(),
+                FileType.EMG => new EMG(),
+                FileType.EMM => new EMM(),
+                FileType.EMO => new EMO(),
+                FileType.LUA => new LUA(),
+                FileType.DDS => new DDS(),
+                FileType.BSR => new BSR(),
+                FileType.RY2 => new RY2(),
+                FileType.BAC => new BAC(),
+                FileType.BCM => new BCM(),
+                _ => new OtherFile(),
+            };
         }
         public static USF4File FetchVersion(BACFileVersion fileversion)
         {
-            switch (fileversion)
+            return fileversion switch
             {
-                case BACFileVersion.SF4:
-                    return new USF4BAC();
-                case BACFileVersion.SXT:
-                    return new SFxTBAC();
-                default:
-                    return new OtherFile();
-            }
+                BACFileVersion.SF4 => new USF4BAC(),
+                BACFileVersion.SXT => new SFxTBAC(),
+                BACFileVersion.UNK => new OtherFile(),
+                _ => new OtherFile(),
+            };
         }
 
         public static USF4File FetchVersion(BCMFileVersion fileversion)
         {
-            switch (fileversion)
+            return fileversion switch
             {
-                case BCMFileVersion.SF4:
-                    return new USF4BCM();
-                case BCMFileVersion.SXT:
-                    return new SFxTBCM();
-                default:
-                    return new OtherFile();
-            }
-        }
-
-        private static USF4File CheckFile(int FileNumber)
-        {
-            switch ((FileType)FileNumber)
-            {
-                case FileType.CSB:
-                    return new CSB();
-                case FileType.EMZ:
-                    return new EMZ();
-                case FileType.EMA:
-                    return new EMA();
-                case FileType.EMB:
-                    return new EMB();
-                case FileType.EMG:
-                    return new EMG();
-                case FileType.EMM:
-                    return new EMM();
-                case FileType.EMO:
-                    return new EMO();
-                case FileType.LUA:
-                    return new LUA();
-                case FileType.DDS:
-                    return new DDS();
-                case FileType.BSR:
-                    return new BSR();
-                case FileType.RY2:
-                    return new RY2();
-                case FileType.BAC:
-                    return new BAC();
-                case FileType.BCM:
-                    return new BCM();
-                default:
-                    return new OtherFile();
-            }
-        }
-
-        private static USF4File CheckBACFileVersion(int VersionNumber)
-        {
-            if (VersionNumber == 0x20) return new SFxTBAC();
-            else if (VersionNumber == 0x28) return new USF4BAC();
-            else return new BAC();
-        }
-
-        private static USF4File CheckBCMFileVersion(int VersionNumber)
-        {
-            if (VersionNumber == 0x4C) return new SFxTBCM();
-            else if (VersionNumber == 0x28) return new USF4BCM();
-            else return new BCM();
+                BCMFileVersion.SF4 => new USF4BCM(),
+                BCMFileVersion.SXT => new SFxTBCM(),
+                BCMFileVersion.UNK => new OtherFile(),
+                _ => new OtherFile(),
+            };
         }
     }
 }

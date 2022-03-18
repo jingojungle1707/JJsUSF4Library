@@ -382,31 +382,6 @@ namespace JJsUSF4Library
             }
         }
 
-        public static USF4File OpenFile(string filepath)
-        {
-            FileStream fsSource = new FileStream(filepath, FileMode.Open, FileAccess.Read);
-            byte[] bytes;
-            using (BinaryReader br = new BinaryReader(fsSource, Encoding.ASCII)) { bytes = br.ReadBytes((int)fsSource.Length); }
-
-            if ((USF4Methods.FileType)ReadInt(true, 0, bytes) == USF4Methods.FileType.EMZ)
-            {
-                Console.WriteLine("File looks compressed, attempting inflation...");
-
-                bytes = Slice(bytes, 0x10, bytes.Length - 0x10);
-
-                List<byte> zipbytes = bytes.ToList();
-
-                bytes = ZlibDecoder.Inflate(zipbytes).ToArray();
-            }
-
-            USF4File file = USF4Methods.CheckFile(Slice(bytes, 0x00, 0x08));
-
-            file.ReadFile(bytes);
-            file.Name = Path.GetFileName(filepath);
-
-            return file;
-        }
-
         public static USF4File OpenFileStreamCheckCompression(string filepath)
         {
             byte[] bytes = Array.Empty<byte>();

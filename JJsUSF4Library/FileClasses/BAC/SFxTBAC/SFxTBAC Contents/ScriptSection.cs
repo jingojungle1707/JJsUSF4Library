@@ -1,13 +1,14 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.IO;
+using System.Xml.Serialization;
 
 namespace JJsUSF4Library.FileClasses.ScriptClasses
 {
     public class ScriptSection
     {
+        public Command.COMMANDTYPE Type;
         public byte
-            Type,
             UnkByte1_0x01;
 
         public List<Command> Commands;
@@ -23,7 +24,7 @@ namespace JJsUSF4Library.FileClasses.ScriptClasses
 
             br.BaseStream.Seek(offset, SeekOrigin.Begin);
 
-            Type = br.ReadByte();
+            Type = (Command.COMMANDTYPE)br.ReadByte();
             UnkByte1_0x01 = br.ReadByte();
             int commandCount = br.ReadInt16();
             int commandTicksPointer = br.ReadInt32();
@@ -60,7 +61,7 @@ namespace JJsUSF4Library.FileClasses.ScriptClasses
 
         public ScriptSection(byte[] Data)
         {
-            Type = Data[0];
+            Type = (Command.COMMANDTYPE)Data[0];
             UnkByte1_0x01 = Data[1];
             int commandCount = USF4Utils.ReadInt(false, 0x02, Data);
             int commandHeadersPointer = USF4Utils.ReadInt(true, 0x04, Data);
@@ -71,8 +72,8 @@ namespace JJsUSF4Library.FileClasses.ScriptClasses
             for (int i = 0; i < commandCount; i++)
             {
                 Commands.Add(new Command(
-                    Data.Slice(commandDatasPointer + i * Command.CommandLengths[(Command.COMMANDTYPE)Type], 0),
-                    (Command.COMMANDTYPE)Type,
+                    Data.Slice(commandDatasPointer + i * Command.CommandLengths[Type], 0),
+                    Type,
                     USF4Utils.ReadInt(false, commandHeadersPointer + i * 0x04, Data),
                     USF4Utils.ReadInt(false, commandHeadersPointer + 0x02 + i * 0x04, Data)
                 ));
@@ -87,7 +88,7 @@ namespace JJsUSF4Library.FileClasses.ScriptClasses
             {
                 Data.AddRange(Commands[i].CommandData.GenerateDataBlockBytes());
             }
-            if (Type == 0x05 || Type == 0x06 || Type == 0x0D) //ETC, Unk6 & GFX are the types that use params
+            if (Type == (Command.COMMANDTYPE)0x05 || Type == (Command.COMMANDTYPE)0x06 || Type == (Command.COMMANDTYPE)0x0D) //ETC, Unk6 & GFX are the types that use params
             {
                 for (int i = 0; i < Commands.Count; i++)
                 {
@@ -122,6 +123,35 @@ namespace JJsUSF4Library.FileClasses.ScriptClasses
                 SFX = 0x0C,
                 GFX = 0x0D,
             }
+            public enum AnimationFile
+            {
+                COMMON = 0x00,
+                UNK1 = 0x01,
+                OBJ = 0x02,
+                CAM = 0x03,
+                FCE = 0x04,
+                UNK5 = 0x05,
+                UNK6 = 0x06,
+                UNK7 = 0x07,
+                UNK8 = 0x08,
+                UNK9 = 0x09,
+                UNKA = 0x0A
+            }
+            public enum SoundFile
+            {
+                COMMON = 0x00,
+                UNK1 = 0x01,
+                CV = 0x02,
+                UNK3 = 0x03,
+                UNK4 = 0x04,
+                UNK5 = 0x05,
+                UNK6 = 0x06,
+                UNK7 = 0x07,
+                UNK8 = 0x08,
+                UNK9 = 0x09,
+                UNKA = 0x0A
+            }
+
             public static Dictionary<COMMANDTYPE, int> CommandLengths = new Dictionary<COMMANDTYPE, int>()
             {
                 { COMMANDTYPE.Flow, 0x0C},
@@ -140,28 +170,49 @@ namespace JJsUSF4Library.FileClasses.ScriptClasses
                 { COMMANDTYPE.GFX, 0x08}
             };
 
+            [XmlElement]
             public CommandDataBlock CommandData;
 
-            private static CommandDataBlock FetchCommandDataBlockType(COMMANDTYPE type)
+            public Command()
             {
-                switch (type)
+
+            }
+
+            [XmlInclude(typeof(CommandDataBlock.FlowCommand))]
+            [XmlInclude(typeof(CommandDataBlock.SpeedCommand))]
+            [XmlInclude(typeof(CommandDataBlock.StatusCommand))]
+            [XmlInclude(typeof(CommandDataBlock.PhysicsCommand))]
+            [XmlInclude(typeof(CommandDataBlock.CancelCommand))]
+            [XmlInclude(typeof(CommandDataBlock.ETCCommand))]
+            [XmlInclude(typeof(CommandDataBlock.Unk6Command))]
+            [XmlInclude(typeof(CommandDataBlock.HitboxCommand))]
+            [XmlInclude(typeof(CommandDataBlock.HurtboxCommand))]
+            [XmlInclude(typeof(CommandDataBlock.PushboxCommand))]
+            [XmlInclude(typeof(CommandDataBlock.AnimationCommand))]
+            [XmlInclude(typeof(CommandDataBlock.AnimationModCommand))]
+            [XmlInclude(typeof(CommandDataBlock.SFXCommand))]
+            [XmlInclude(typeof(CommandDataBlock.GFXCommand))]
+            public static CommandDataBlock FetchCommandDataBlockType(COMMANDTYPE type)
+            {
+                return type switch
                 {
-                    case COMMANDTYPE.Flow: return new CommandDataBlock.FlowCommand();
-                    case COMMANDTYPE.Speed: return new CommandDataBlock.SpeedCommand();
-                    case COMMANDTYPE.Status: return new CommandDataBlock.StatusCommand();
-                    case COMMANDTYPE.Physics: return new CommandDataBlock.PhysicsCommand();
-                    case COMMANDTYPE.Cancel: return new CommandDataBlock.CancelCommand();
-                    case COMMANDTYPE.ETC: return new CommandDataBlock.ETCCommand();
-                    case COMMANDTYPE.Unk6: return new CommandDataBlock.Unk6Command();
-                    case COMMANDTYPE.Hitbox: return new CommandDataBlock.HitboxCommand();
-                    case COMMANDTYPE.Hurtbox: return new CommandDataBlock.HurtboxCommand();
-                    case COMMANDTYPE.Pushbox: return new CommandDataBlock.PushboxCommand();
-                    case COMMANDTYPE.Animation: return new CommandDataBlock.AnimationCommand();
-                    case COMMANDTYPE.AnimationMod: return new CommandDataBlock.AnimationModCommand();
-                    case COMMANDTYPE.SFX: return new CommandDataBlock.SFXCommand();
-                    case COMMANDTYPE.GFX: return new CommandDataBlock.GFXCommand();
-                    default: return new CommandDataBlock();
-                }
+                    COMMANDTYPE.Flow => new CommandDataBlock.FlowCommand(),
+                    COMMANDTYPE.Speed => new CommandDataBlock.SpeedCommand(),
+                    COMMANDTYPE.Status => new CommandDataBlock.StatusCommand(),
+                    COMMANDTYPE.Physics => new CommandDataBlock.PhysicsCommand(),
+                    COMMANDTYPE.Cancel => new CommandDataBlock.CancelCommand(),
+                    COMMANDTYPE.ETC => new CommandDataBlock.ETCCommand(),
+                    COMMANDTYPE.Unk6 => new CommandDataBlock.Unk6Command(),
+                    COMMANDTYPE.Hitbox => new CommandDataBlock.HitboxCommand(),
+                    COMMANDTYPE.Hurtbox => new CommandDataBlock.HurtboxCommand(),
+                    COMMANDTYPE.Pushbox => new CommandDataBlock.PushboxCommand(),
+                    COMMANDTYPE.Animation => new CommandDataBlock.AnimationCommand(),
+                    COMMANDTYPE.AnimationMod => new CommandDataBlock.AnimationModCommand(),
+                    COMMANDTYPE.SFX => new CommandDataBlock.SFXCommand(),
+                    COMMANDTYPE.GFX => new CommandDataBlock.GFXCommand(),
+                    COMMANDTYPE.UNKNOWN => new CommandDataBlock(),
+                    _ => new CommandDataBlock(),
+                };
             }
 
             public Command(BinaryReader br, COMMANDTYPE type, int startTick, int endTick)
@@ -838,8 +889,8 @@ namespace JJsUSF4Library.FileClasses.ScriptClasses
                 {
                     public int
                         ID; //Short
+                    public AnimationFile File;
                     public byte
-                        File,
                         Flags;
                     public int
                         Start, //Short
@@ -851,7 +902,7 @@ namespace JJsUSF4Library.FileClasses.ScriptClasses
                         StartTick = startTick;
                         EndTick = endTick;
                         ID = USF4Utils.ReadInt(false, 0x00, Data);
-                        File = Data[0x02];
+                        File = (AnimationFile)Data[0x02];
                         Flags = Data[0x03];
                         Start = USF4Utils.ReadInt(false, 0x04, Data);
                         End = USF4Utils.ReadInt(false, 0x06, Data);
@@ -861,7 +912,7 @@ namespace JJsUSF4Library.FileClasses.ScriptClasses
                         StartTick = startTick;
                         EndTick = endTick;
                         ID = br.ReadInt16();
-                        File = br.ReadByte();
+                        File = (AnimationFile)br.ReadByte();
                         Flags = br.ReadByte();
                         Start = br.ReadInt16();
                         End = br.ReadInt16();
@@ -871,7 +922,7 @@ namespace JJsUSF4Library.FileClasses.ScriptClasses
                         List<byte> Data = new List<byte>();
 
                         USF4Utils.AddIntAsBytes(Data, ID, false);
-                        Data.Add(File);
+                        Data.Add((byte)File);
                         Data.Add(Flags);
                         USF4Utils.AddIntAsBytes(Data, Start, false);
                         USF4Utils.AddIntAsBytes(Data, End, false);

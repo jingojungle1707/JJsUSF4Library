@@ -95,7 +95,7 @@ namespace JJsUSF4Library.FileClasses.ScriptClasses
             for (int i = 0; i < ScriptSections.Count; i++)
             {
                 ScriptSection ss = ScriptSections[i];
-                Data.Add(ss.Type);
+                Data.Add((byte)ss.Type);
                 Data.Add(ss.UnkByte1_0x01);
                 USF4Utils.AddIntAsBytes(Data, ss.Commands.Count, false);
                 CommandHeaderPointerPositions.Add(Data.Count);
