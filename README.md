@@ -1,6 +1,6 @@
 # JJsUSF4Library
 
-net5.0 library for reading and writing files DIMPS engine game files (SF4, SFxT, Saint Seiya Soldiers' Soul and Dragonball Xenoverse).
+net5.0 library for reading and writing DIMPS engine game files (SF4, SFxT, Saint Seiya Soldiers' Soul and Dragonball Xenoverse).
 Classes are written primarily with SF4 in mind, aside from a couple of SFxT specific variants, so YMMV working with files from 
 later DIMPS engine games.
 
