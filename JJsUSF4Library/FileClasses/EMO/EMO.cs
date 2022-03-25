@@ -205,13 +205,5 @@ namespace JJsUSF4Library.FileClasses
         {
             USF4Utils.WriteDataToStream(path, GenerateSFxTBytes());
         }
-
-        public override void DeleteSubfile(int index)
-        {
-            if (index < EMGs.Count)
-            {
-                EMGs.RemoveAt(index);
-            }
-        }
     }
 }

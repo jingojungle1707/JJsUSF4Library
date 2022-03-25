@@ -1,21 +1,26 @@
-﻿using System.Collections.Generic;
+﻿using System;
+using System.Collections.Generic;
+using System.Diagnostics;
 using System.IO;
 
 namespace JJsUSF4Library.FileClasses.ScriptClasses
 {
     public class HitEffectData
     {
-        public string Name;
+        public HitEffectType Type;
+        public int Damage;
+        public EffectType Effect;
         public int
-            Damage,
-            Effect, //Effect & script might actually be the same value, just listed in the JSON twice for clarity?
             Script,
             AHitstop,
             AShaking,
             VHitstop,
-            VShaking,
-            //0x10
-            UnkLong7_0x10,
+            VShaking;
+        //0x10
+        public HitEffectFlag
+            Flags;
+
+        public int
             HitStun, //0x14
             HitStun2,
             UnkShort10_0x18;
@@ -35,30 +40,94 @@ namespace JJsUSF4Library.FileClasses.ScriptClasses
         public List<OffsetCommand> OffsetCommands;
         public List<HitEffectParam> HitEffectParams;
 
+        public enum HitEffectType
+        {
+            STAND_HIT = 0x00,
+            CROUCH_HIT = 0x01,
+            PREJUMP_HIT = 0x02,
+            AIR_HIT = 0x03,
+            POSTBOUND_HIT = 0x04,
+            STAND_GUARD = 0x05,
+            CROUCH_GUARD = 0x06,
+            PREJUMP_GUARD = 0x07,
+            AIR_GUARD = 0x08,
+            POSTBOUND_GUARD = 0x09,
+            STAND_COUNTERHIT = 0x0A,
+            CROUCH_COUNTERHIT = 0x0B,
+            PREJUMP_COUNTERHIT = 0x0C,
+            AIR_COUNTERHIT = 0x0D,
+            POSTBOUND_COUNTERHIT = 0x0E,
+            UNUSED_1 = 0x0F,
+            UNUSED_2 = 0x10,
+            UNUSED_3 = 0x11,
+            UNUSED_4 = 0x12,
+            UNUSED_5 = 0x13,
+        }
+
+        public enum EffectType
+        {
+            UNK = -0x01,
+            NONE = 0x00,
+            HIT = 0x01,
+            BLOCK = 0x02,
+            BLOW = 0x03,
+            BOUND = 0x04,
+        }
+
+        [Flags]
+        public enum HitEffectFlag
+        {
+            UNKOTHER = -1,
+            NONE = 0x00,
+            USE_LOCAL_SCRIPT = 0x01,
+            UNK0x02 = 0x02,
+            UNK0x04 = 0x04,
+            HARD_KNOCKDOWN = 0x08
+        }
+
         public HitEffectData()
         {
 
         }
 
-        public HitEffectData(BinaryReader br, int offset = 0)
+        public HitEffectData(BinaryReader br, HitEffectType type, int offset = 0)
         {
+            Type = type;
+
             br.BaseStream.Seek(offset, SeekOrigin.Begin);
 
             OffsetCommands = new List<OffsetCommand>();
             HitEffectParams = new List<HitEffectParam>();
 
             Damage = br.ReadInt32();
-            Effect = br.ReadInt16();
+            Effect = (EffectType)br.ReadInt16();
+
+            if (Effect == EffectType.UNK)
+            {
+
+            }
+
             Script = br.ReadInt16();
+
+            if (Script != 0)
+            {
+
+            }
+
             AHitstop = br.ReadInt16();
             AShaking = br.ReadInt16();
             VHitstop = br.ReadInt16();
             VShaking = br.ReadInt16();
             //0x10
-            UnkLong7_0x10 = br.ReadInt32();
+            Flags = (HitEffectFlag)br.ReadInt32();
+
             HitStun = br.ReadInt16();
             HitStun2 = br.ReadInt16();
             UnkShort10_0x18 = br.ReadInt16();
+#if DEBUG
+            Debug.WriteLine($"Type: {Type}; EffectType: {Effect}; ScriptID: {Script}; Flags: {Flags}; Short0x18: {UnkShort10_0x18}");
+#endif
+
             int offsetCommandCount = br.ReadByte();
             int hitEffectParamCount = br.ReadByte();
             AMeter = br.ReadInt16();
@@ -73,21 +142,7 @@ namespace JJsUSF4Library.FileClasses.ScriptClasses
             for (int i = 0; i < offsetCommandCount; i++)
             {
                 //Each offset command is length 0x08
-                OffsetCommands.Add(new OffsetCommand()
-                {
-                    UnkShort0_0x00 = br.ReadInt16(),
-                    UnkByte1_0x02 = br.ReadByte(),
-                    ParamCount = br.ReadByte(),
-                    ParamPointer = br.ReadInt32(),
-                    Params = new List<int>()
-                });
-
-                //Populate offsetCommand parameters
-                br.BaseStream.Seek(offset + offsetCommandPointer + OffsetCommands[i].ParamPointer, SeekOrigin.Begin);
-                for (int j = 0; j < OffsetCommands[i].ParamCount; j++)
-                {
-                    OffsetCommands[i].Params.Add(br.ReadInt32());
-                }
+                OffsetCommands.Add(new OffsetCommand(br, offset + offsetCommandPointer + i * 0x08));
             }
             br.BaseStream.Seek(offset + hitEffectParamPointer, SeekOrigin.Begin);
             for (int i = 0; i < hitEffectParamCount; i++)
@@ -102,71 +157,32 @@ namespace JJsUSF4Library.FileClasses.ScriptClasses
             }
         }
 
-        public HitEffectData(byte[] Data)
-        {
-            OffsetCommands = new List<OffsetCommand>();
-            HitEffectParams = new List<HitEffectParam>();
-
-            Damage = USF4Utils.ReadInt(true, 0x00, Data);
-            Effect = USF4Utils.ReadInt(false, 0x04, Data);
-            Script = USF4Utils.ReadInt(false, 0x06, Data);
-            AHitstop = USF4Utils.ReadInt(false, 0x08, Data);
-            AShaking = USF4Utils.ReadInt(false, 0x0A, Data);
-            VHitstop = USF4Utils.ReadInt(false, 0x0C, Data);
-            VShaking = USF4Utils.ReadInt(false, 0x0E, Data);
-            //0x10
-            UnkLong7_0x10 = USF4Utils.ReadInt(true, 0x10, Data);
-            HitStun = USF4Utils.ReadInt(false, 0x14, Data);
-            HitStun2 = USF4Utils.ReadInt(false, 0x16, Data);
-            UnkShort10_0x18 = USF4Utils.ReadInt(false, 0x18, Data);
-            int offsetCommandCount = Data[0x1A];
-            int hitEffectParamCount = Data[0x1B];
-            AMeter = USF4Utils.ReadInt(false, 0x1C, Data);
-            VMeter = USF4Utils.ReadInt(false, 0x1E, Data);
-            //0x20
-            ForceX = USF4Utils.ReadFloat(0x20, Data);
-            ForceY = USF4Utils.ReadFloat(0x24, Data);
-            int offsetCommandPointer = USF4Utils.ReadInt(true, 0x28, Data);
-            int hitEffectParamPointer = USF4Utils.ReadInt(true, 0x2C, Data);
-
-            for (int i = 0; i < offsetCommandCount; i++)
-            {
-                //Each offset command is length 0x08
-                OffsetCommand offsetCommand = new OffsetCommand()
-                {
-                    UnkShort0_0x00 = USF4Utils.ReadInt(false, offsetCommandPointer + i * 0x08, Data),
-                    UnkByte1_0x02 = Data[offsetCommandPointer + 2 + i * 0x08],
-                    ParamCount = Data[offsetCommandPointer + 3 + i * 0x08],
-                    ParamPointer = USF4Utils.ReadInt(true, offsetCommandPointer + 0x04 + i * 0x08, Data),
-                    Params = new List<int>()
-                };
-                //Populate parameters
-                for (int j = 0; j < offsetCommand.ParamCount; j++) offsetCommand.Params.Add(USF4Utils.ReadInt(true, offsetCommandPointer + i * 0x08 + offsetCommand.ParamPointer + j * 0x04, Data));
-                //Push offsetCommand to list
-                OffsetCommands.Add(offsetCommand);
-            }
-            for (int i = 0; i < hitEffectParamCount; i++)
-            {
-                HitEffectParams.Add(new HitEffectParam()
-                {
-                    UnkShort0_0x00 = USF4Utils.ReadInt(false, hitEffectParamPointer + 0x00 + i * 0x08, Data),
-                    UnkShort1_0x02 = USF4Utils.ReadInt(false, hitEffectParamPointer + 0x02 + i * 0x08, Data),
-                    UnkShort2_0x04 = USF4Utils.ReadInt(false, hitEffectParamPointer + 0x04 + i * 0x08, Data),
-                    UnkShort3_0x06 = USF4Utils.ReadInt(false, hitEffectParamPointer + 0x06 + i * 0x08, Data),
-                });
-            }
-        }        
-
         public class OffsetCommand
         {
             public int
                 UnkShort0_0x00;
             public byte
-                UnkByte1_0x02,
-                ParamCount;
-            public int
-                ParamPointer;
+                UnkByte1_0x02;
             public List<int> Params;
+
+            public OffsetCommand()
+            {
+
+            }
+            public OffsetCommand(BinaryReader br, int offset = 0)
+            {
+                br.BaseStream.Seek(offset, SeekOrigin.Begin);
+
+                UnkShort0_0x00 = br.ReadInt16();
+                UnkByte1_0x02 = br.ReadByte();
+                int paramCount = br.ReadByte();
+                int paramPointer = br.ReadInt32();
+
+                Params = new List<int>();
+                br.BaseStream.Seek(offset + paramPointer, SeekOrigin.Begin);
+                for (int i = 0; i < paramCount; i++) Params.Add(br.ReadInt32());
+            }
+
         }
         public class HitEffectParam
         {

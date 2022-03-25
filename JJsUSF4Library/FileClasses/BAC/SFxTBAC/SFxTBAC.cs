@@ -1,5 +1,7 @@
 ﻿using JJsUSF4Library.FileClasses.ScriptClasses;
+using System;
 using System.Collections.Generic;
+using System.Diagnostics;
 using System.IO;
 using System.Linq;
 using System.Text;
@@ -86,49 +88,13 @@ namespace JJsUSF4Library.FileClasses
             for (int i = 0; i < hitEffectCount; i++)
             {
                 if (hitEffectPointers[i] == 0) HitEffects.Add(new HitEffect());
-                else HitEffects.Add(new HitEffect(br, hitEffectNames[i], offset + hitEffectPointers[i]));
-            }
-        }
-
-        public SFxTBAC(byte[] Data)
-        {
-            ReadFile(Data);
-        }
-
-        public override void ReadFile(byte[] Data)
-        {
-            List<int> scriptFilePointers = new List<int>();
-            List<int> scriptFileNamePointers = new List<int>();
-            List<int> hitEffectPointers = new List<int>();
-            List<int> hitEffectNamePointers = new List<int>();
-
-            ScriptFiles = new List<ScriptFile>();
-            HitEffects = new List<HitEffect>();
-
-            int scriptFileCount = USF4Utils.ReadInt(false, 0x0C, Data);
-            int hitEffectCount = USF4Utils.ReadInt(false, 0x0E, Data);
-
-            int scriptFileIndexPointer = USF4Utils.ReadInt(true, 0x10, Data);
-            int scriptFileNameIndexPointer = USF4Utils.ReadInt(true, 0x14, Data);
-            int hitEffectIndexPointer = USF4Utils.ReadInt(true, 0x18, Data);
-            int hitEffectNameIndexPointer = USF4Utils.ReadInt(true, 0x1C, Data);
-
-            for (int i = 0; i < scriptFileCount; i++)
-            {
-                scriptFilePointers.Add(USF4Utils.ReadInt(true, scriptFileIndexPointer + i * 4, Data));
-                scriptFileNamePointers.Add(USF4Utils.ReadInt(true, scriptFileNameIndexPointer + i * 4, Data));
-                ScriptFiles.Add(new ScriptFile(Data, scriptFilePointers[i], Encoding.ASCII.GetString(USF4Utils.ReadZeroTermStringToArray(scriptFileNamePointers[i], Data, Data.Length))));
-            }
-            for (int i = 0; i < hitEffectCount; i++)
-            {
-                hitEffectPointers.Add(USF4Utils.ReadInt(true, hitEffectIndexPointer + i * 4, Data));
-                hitEffectNamePointers.Add(USF4Utils.ReadInt(true, hitEffectNameIndexPointer + i * 4, Data));
-                if (hitEffectPointers[i] != 0 && hitEffectNamePointers[i] != 0)
+                else
                 {
-                    //TODO PASS THE CORRECT AMOUNT OF DATA INSTEAD OF THIS BULLSHIT
-                    HitEffects.Add(new HitEffect(Data.Slice(hitEffectPointers[i], 0), Encoding.ASCII.GetString(USF4Utils.ReadZeroTermStringToArray(hitEffectNamePointers[i], Data, Data.Length))));
+#if DEBUG
+                    Debug.WriteLine($"HitEffect: {hitEffectNames[i]}");
+#endif
+                    HitEffects.Add(new HitEffect(br, hitEffectNames[i], offset + hitEffectPointers[i]));
                 }
-                else HitEffects.Add(new HitEffect());
             }
         }
 

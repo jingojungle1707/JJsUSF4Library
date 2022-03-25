@@ -8,10 +8,9 @@ namespace JJsUSF4Library.FileClasses
 {
     public class EMA : USF4File
     {
-        public int MysteryIntOS12;
-        public List<Animation> Animations;
-
-        public Skeleton Skeleton;
+        public int MysteryIntOS12 { get; set; }
+        public Skeleton Skeleton { get; set; }
+        public List<Animation> Animations { get; set; }
 
         public EMA()
         {
@@ -21,11 +20,6 @@ namespace JJsUSF4Library.FileClasses
         {
             Name = name;
             ReadFromStream(br, offset);
-        }
-        public EMA(byte[] Data, string name)
-        {
-            Name = name;
-            ReadFile(Data);
         }
 
         public override void ReadFromStream(BinaryReader br, int offset = 0, int fileLength = 0)
@@ -54,12 +48,12 @@ namespace JJsUSF4Library.FileClasses
         }
 
         public override byte[] GenerateBytes()
-        {
+    {
             //EMA + some stuff
             List<byte> data = new List<byte>() { 0x23, 0x45, 0x4D, 0x41, 0xFE, 0xFF, 0x20, 0x00, 0x01, 0x00, 0x00, 0x00 };
 
             int skeletonPointerPosition = data.Count;   //Store skeleton pointer pos for later updating
-            USF4Utils.AddIntAsBytes(data, -1, true);
+            USF4Utils.AddIntAsBytes(data, 0, true);
             USF4Utils.AddIntAsBytes(data, Animations.Count, false);
             USF4Utils.AddIntAsBytes(data, MysteryIntOS12, false); //Always 0x03?
             USF4Utils.AddZeroToLineEnd(data); //Pad out to O/S 0x20
@@ -68,7 +62,7 @@ namespace JJsUSF4Library.FileClasses
             for (int i = 0; i < Animations.Count; i++)
             {
                 animationPointerPositions.Add(data.Count);
-                USF4Utils.AddIntAsBytes(data, -1, true);
+                USF4Utils.AddIntAsBytes(data, 0, true);
             }
 
             List<int> animationStartOSs = new List<int>();
@@ -76,60 +70,11 @@ namespace JJsUSF4Library.FileClasses
 
             for (int i = 0; i < Animations.Count; i++)
             {
-                List<int> cMDTrackPointerPositions = new List<int>();
                 animationStartOSs.Add(data.Count);
-
+                animationNamePointerPositions.Add(data.Count + 0x0C);
                 USF4Utils.UpdateIntAtPosition(data, animationPointerPositions[i], data.Count);
-                USF4Utils.AddIntAsBytes(data, Animations[i].Duration, false);
-                USF4Utils.AddIntAsBytes(data, Animations[i].CMDTracks.Count, false);
-                USF4Utils.AddIntAsBytes(data, Animations[i].ValuesList.Count, true);
-                USF4Utils.AddIntAsBytes(data, 0x00, true); //Padding zeroes
 
-                animationNamePointerPositions.Add(data.Count);
-                USF4Utils.AddIntAsBytes(data, -1, true);
-                int valuePointerPosition = data.Count;
-                USF4Utils.AddIntAsBytes(data, -1, true);
-
-                for (int j = 0; j < Animations[i].CMDTracks.Count; j++)
-                {   //Write out dummy CMD track pointers and store the pos for later update
-                    cMDTrackPointerPositions.Add(data.Count);
-                    USF4Utils.AddIntAsBytes(data, -1, true);
-                }
-                for (int j = 0; j < Animations[i].CMDTracks.Count; j++)
-                {   //Start writing out CMD tracks, update pos
-                    int CMDStartOS = data.Count;
-                    USF4Utils.UpdateIntAtPosition(data, cMDTrackPointerPositions[j], data.Count - animationStartOSs[i]);
-                    USF4Utils.AddIntAsBytes(data, Animations[i].CMDTracks[j].BoneID, false); //BoneID
-                    data.Add(Convert.ToByte(Animations[i].CMDTracks[j].TransformType)); //Transform type
-                    data.Add(Convert.ToByte(Animations[i].CMDTracks[j].BitFlag));       //Bitflag
-                    USF4Utils.AddIntAsBytes(data, Animations[i].CMDTracks[j].Steps.Count, false);
-                    int IndicesPointerPosition = data.Count; //Store position of indices pointer
-                    USF4Utils.AddIntAsBytes(data, -1, false);
-
-                    for (int k = 0; k < Animations[i].CMDTracks[j].Steps.Count; k++)
-                    {
-                        if ((Animations[i].CMDTracks[j].BitFlag & 0x20) != 0x20) data.Add((byte)Animations[i].CMDTracks[j].Steps[k].Frame);
-
-                        else USF4Utils.AddIntAsBytes(data, Animations[i].CMDTracks[j].Steps[k].Frame, false);
-                    }
-
-                    if ((data.Count - CMDStartOS) % 2 != 0)
-                    {
-                        data.Add(0x00);
-                    }
-                    USF4Utils.UpdateShortAtPosition(data, IndicesPointerPosition, data.Count - CMDStartOS);
-
-                    for (int k = 0; k < Animations[i].CMDTracks[j].Steps.Count; k++)
-                    {
-                        USF4Utils.AddIntAsBytes(data, Animations[i].CMDTracks[j].Steps[k].Index, (Animations[i].CMDTracks[j].BitFlag & 0x40) == 0x40);
-                    }
-                }
-                //Value list...
-                USF4Utils.UpdateIntAtPosition(data, valuePointerPosition, data.Count - animationStartOSs[i]);
-                for (int j = 0; j < Animations[i].ValuesList.Count; j++)
-                {
-                    USF4Utils.AddFloatAsBytes(data, Animations[i].ValuesList[j]);
-                }
+                data.AddRange(Animations[i].GenerateBytes());
             }
 
             USF4Utils.AddZeroToLineEnd(data);
@@ -168,11 +113,7 @@ namespace JJsUSF4Library.FileClasses
             data.Add(0x00);
 
             return data.ToArray();
-        }
-
-        public override void DeleteSubfile(int index)
-        {
-            Animations.RemoveAt(index);
+            
         }
     }
 }

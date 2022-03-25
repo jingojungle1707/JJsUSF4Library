@@ -5,6 +5,7 @@ using System.Linq;
 using System.IO.Compression;
 using System.Text;
 using JJsUSF4Library.FileClasses;
+using System.Numerics;
 
 namespace JJsUSF4Library
 {
@@ -133,6 +134,26 @@ namespace JJsUSF4Library
         public static void AddFloatAsBytes(List<byte> targetList, float Data)
         {
             targetList.AddRange(BitConverter.GetBytes(Data));
+        }
+
+        public static void AddMatrix4x4AsBytes(List<byte> data, Matrix4x4 m)
+        {
+            AddFloatAsBytes(data, m.M11);
+            AddFloatAsBytes(data, m.M12);
+            AddFloatAsBytes(data, m.M13);
+            AddFloatAsBytes(data, m.M14);
+            AddFloatAsBytes(data, m.M21);
+            AddFloatAsBytes(data, m.M22);
+            AddFloatAsBytes(data, m.M23);
+            AddFloatAsBytes(data, m.M24);
+            AddFloatAsBytes(data, m.M31);
+            AddFloatAsBytes(data, m.M32);
+            AddFloatAsBytes(data, m.M33);
+            AddFloatAsBytes(data, m.M34);
+            AddFloatAsBytes(data, m.M41);
+            AddFloatAsBytes(data, m.M42);
+            AddFloatAsBytes(data, m.M43);
+            AddFloatAsBytes(data, m.M44);
         }
 
         public static void AddIntAsBytes(List<byte> targetList, int Data, bool IsLong)

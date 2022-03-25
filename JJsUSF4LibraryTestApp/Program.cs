@@ -4,6 +4,8 @@ using JJsUSF4Library.FileClasses.ScriptClasses;
 using JJsUSF4Library.FileClasses.SubfileClasses;
 using System.IO;
 using System;
+using System.Collections.Generic;
+using System.Numerics;
 
 namespace JJsUSF4LibraryTestApp
 {

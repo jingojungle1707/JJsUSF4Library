@@ -54,47 +54,6 @@ namespace JJsUSF4Library.FileClasses
             for (int i = 0; i < influencingNodeCount; i++) InfluencingNodeNames.Add(USF4Utils.ReadZString(br));
 
         }
-        public BSR(byte[] Data, string name)
-        {
-            Name = name;
-            ReadFile(Data);
-        }
-
-        //public override void ReadFile(byte[] Data)
-        //{
-        //    HEXBytes = Data;
-        //    int physicsCount = USF4Utils.ReadInt(true, 0x0C, Data);
-        //    int physicsIndexPointer = USF4Utils.ReadInt(true, 0x10, Data);
-        //    int nodeCount = USF4Utils.ReadInt(true, 0x14, Data); //Number of bones with physics calculations
-        //    int nodeNamesIndexPointer = USF4Utils.ReadInt(true, 0x18, Data);
-        //    int influencingNodeCount = USF4Utils.ReadInt(true, 0x1C, Data); //List of bones which input motion into physics chains??
-        //    int influencingNodeNameIndexPointer = USF4Utils.ReadInt(true, 0x20, Data);
-
-        //    List<int> physicsPointerList = new List<int>();
-        //    Physics = new List<Physic>();
-        //    List<int> nodeNamesPointerList = new List<int>();
-        //    NodeNames = new List<string>();
-        //    List<int> influencingNodeNamesPointerList = new List<int>();
-        //    InfluencingNodeNames = new List<string>();
-
-        //    for (int i = 0; i < physicsCount; i++)
-        //    {
-        //        physicsPointerList.Add(USF4Utils.ReadInt(true, physicsIndexPointer + i * 4, Data));
-        //        Physics.Add(new Physic(Data.Slice(physicsPointerList[i], 0)));
-        //    }
-
-        //    for (int i = 0; i < nodeCount; i++)
-        //    {
-        //        nodeNamesPointerList.Add(USF4Utils.ReadInt(true, nodeNamesIndexPointer + i * 4, Data));
-        //        NodeNames.Add(Encoding.ASCII.GetString(USF4Utils.ReadZeroTermStringToArray(nodeNamesPointerList[i], Data, Data.Length)));
-        //    }
-
-        //    for (int i = 0; i < influencingNodeCount; i++)
-        //    {
-        //        influencingNodeNamesPointerList.Add(USF4Utils.ReadInt(true, influencingNodeNameIndexPointer + i * 4, Data));
-        //        InfluencingNodeNames.Add(Encoding.ASCII.GetString(USF4Utils.ReadZeroTermStringToArray(influencingNodeNamesPointerList[i], Data, Data.Length)));
-        //    }
-        //}
 
         public override byte[] GenerateBytes()
         {

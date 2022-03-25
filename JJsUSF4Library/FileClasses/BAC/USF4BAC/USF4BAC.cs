@@ -27,11 +27,6 @@ namespace JJsUSF4Library.FileClasses
             Name = name;
             ReadFromStream(br, offset);
         }
-        public USF4BAC(byte[] Data, string name)
-        {
-            Name = name;
-            ReadFile(Data);
-        }
 
         public override void ReadFromStream(BinaryReader br, int offset = 0, int fileLength = 0)
         {

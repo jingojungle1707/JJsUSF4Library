@@ -1,26 +1,83 @@
-﻿using System.Collections.Generic;
+﻿using System;
+using System.Collections.Generic;
 using System.IO;
+using System.Linq;
 
 namespace JJsUSF4Library.FileClasses.SubfileClasses
 {
     public class CMDTrack
     {
-        public byte[] HEXBytes;
         public int BoneID;
         public byte TransformType;
         public byte BitFlag;
-        public List<Step> Steps;
-        public List<float> IndicesValues;
+        private List<Step> _steps = new List<Step>();
+
+        [Flags]
+        public enum CMDBitFlag
+        {
+            X = 0x00,
+            Y = 0x01,
+            Z = 0x02,
+            UNK0x04 = 0x04,
+            UNK0x08 = 0x08,
+            ABSOLUTE = 0x10,
+            SHORTSTEPS = 0x20,
+            LONGINDICES = 0x40,
+            UNK0x80 = 0x80
+        }
+
+        //Ensure step list is always ordered
+        public List<Step> Steps { get; set; }
 
         public class Step
         {
-            public int Frame;
-            public int Index;
+            //Nullable tangent so we can differentiate between 0f and "no tangent"
+            private float? _tangent;
+            public int Frame { get; set; }
+            public float Value { get; set; }
+            public float Tangent 
+            {
+                get 
+                {
+                    return _tangent ?? default;
+                }
+                set
+                {
+                    _tangent = value;
+                    HasTangent = true;
+                }
+            }
+            public bool HasTangent { get; private set; }
 
-            public Step(int frame, int index)
+            public Step(int frame, float value, float? tangent = 0)
             {
                 Frame = frame;
-                Index = index;
+                Value = value;
+                if (tangent != null) Tangent = tangent ?? default;
+            }
+
+            public Step(int frame, List<float> values, int index, bool long_indices)
+            {
+                int valueIndex;
+                int tangentIndex;
+
+                if (long_indices)
+                {
+                    valueIndex = index & 0x3FFFFFFF;
+                    tangentIndex = (index >> 30) & 3;
+                }
+                else
+                {
+                    valueIndex = index & 0x3FFF;
+                    tangentIndex = (index >> 14) & 3;
+                }
+
+                Frame = frame;
+                Value = values[valueIndex];
+                if (tangentIndex > 0)
+                {
+                    Tangent = values[valueIndex + tangentIndex];
+                }
             }
         }
 
@@ -28,7 +85,7 @@ namespace JJsUSF4Library.FileClasses.SubfileClasses
         {
         }
 
-        public CMDTrack(BinaryReader br, int offset = 0)
+        public CMDTrack(BinaryReader br, List<float> values, int offset = 0)
         {
             br.BaseStream.Seek(offset, SeekOrigin.Begin);
 
@@ -63,7 +120,8 @@ namespace JJsUSF4Library.FileClasses.SubfileClasses
             {
                 for (int i = 0; i < stepCount; i++) indicesList.Add(br.ReadInt16());
             }
-            for (int i = 0; i < stepCount; i++) Steps.Add(new Step(stepList[i], indicesList[i]));
+
+            for (int i = 0; i < stepCount; i++) Steps.Add(new Step(stepList[i], values, indicesList[i], long_indices));
         }
     }
 }

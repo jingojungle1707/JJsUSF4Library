@@ -1,4 +1,6 @@
 ﻿
+using System.IO;
+
 namespace JJsUSF4Library.FileClasses
 {
     public class RY2 : USF4File
@@ -13,23 +15,21 @@ namespace JJsUSF4Library.FileClasses
 
         }
 
-        public RY2(byte[] Data, string name)
+        public RY2(BinaryReader br, string name, int offset = 0)
         {
             Name = name;
-            ReadFile(Data);
+            ReadFromStream(br, offset);
         }
 
-        public override void ReadFile(byte[] Data)
+        public override void ReadFromStream(BinaryReader br, int offset = 0, int fileLength = 0)
         {
-            PhysicsCount = USF4Utils.ReadInt(true, 0x10, Data);
-            PhysicsIndexPointer = USF4Utils.ReadInt(true, 0x14, Data);
-            PhysicsNamesCount = USF4Utils.ReadInt(true, 0x18, Data);
-            PhysicsNamesIndexPointer = USF4Utils.ReadInt(true, 0x1C, Data);
+            br.BaseStream.Seek(offset + 0x10, SeekOrigin.Begin);
 
-            for (int i = 0; i < PhysicsCount; i++)
-            {
+            PhysicsCount = br.ReadInt32();
+            PhysicsIndexPointer = br.ReadInt32();
+            PhysicsNamesCount = br.ReadInt32();
+            PhysicsNamesIndexPointer = br.ReadInt32();
 
-            }
         }
     }
 }

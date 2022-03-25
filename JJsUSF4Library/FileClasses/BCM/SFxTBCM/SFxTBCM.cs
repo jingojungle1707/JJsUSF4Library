@@ -70,12 +70,6 @@ namespace JJsUSF4Library.FileClasses
             ReadFromStream(br, offset);
         }
 
-        public SFxTBCM(byte[] Data, string name)
-        {
-            Name = name;
-            ReadFile(Data);
-        }
-
         public override void ReadFromStream(BinaryReader br, int offset = 0, int fileLength = 0)
         {
             //Initialise lists
@@ -223,103 +217,6 @@ namespace JJsUSF4Library.FileClasses
             }
 
             #endregion
-        }
-
-        public override void ReadFile(byte[] Data)
-        {
-            //Initialise lists
-            Charges = new List<SFxTBCMCharge>();
-            InputMotions = new List<SFxTBCMInputMotion>();
-            Moves = new List<SFxTBCMMove>();
-            Cancels = new List<SFxTBCMCancel>();
-
-            List<int> chargePointers = new List<int>();
-            List<int> inputMotionPointers = new List<int>();
-            List<int> movePointers = new List<int>();
-            List<int> cancelPointers = new List<int>();
-            List<int> inputMotionNamePointers = new List<int>();
-            List<int> chargeNamePointers = new List<int>();
-            List<int> moveNamePointers = new List<int>();
-            List<int> cancelNamePointers = new List<int>();
-
-            NameIndex = new List<string>();
-
-            //Read header
-            int chargeCount = USF4Utils.ReadInt(false, 0x0C, Data);
-            int inputMotionCount = USF4Utils.ReadInt(false, 0x0E, Data);
-            //0x10
-            int moveCount = USF4Utils.ReadInt(false, 0x10, Data);
-            int cancelCount = USF4Utils.ReadInt(false, 0x12, Data);
-            int chargeIndexPointer = USF4Utils.ReadInt(true, 0x14, Data);
-            int chargeNameIndexPointer = USF4Utils.ReadInt(true, 0x18, Data);
-            int inputMotionIndexPointer = USF4Utils.ReadInt(true, 0x1C, Data);
-            //0x20
-            int inputMotionNameIndexPointer = USF4Utils.ReadInt(true, 0x20, Data);
-            int moveIndexPointer = USF4Utils.ReadInt(true, 0x24, Data);
-            int moveNameIndexPointer = USF4Utils.ReadInt(true, 0x28, Data);
-            int cancelIndexPointer = USF4Utils.ReadInt(true, 0x2C, Data);
-            //0x30
-            int cancelNameIndexPointer = USF4Utils.ReadInt(true, 0x30, Data);
-            UnkByte_0x34 = Data[0x34];
-            UnkByte_0x35 = Data[0x35];
-            UnkByte_0x36 = Data[0x36];
-            UnkByte_0x37 = Data[0x37];
-            UnkShort_0x38 = USF4Utils.ReadInt(false, 0x38, Data);
-            UnkShort_0x3A = USF4Utils.ReadInt(false, 0x3A, Data);
-            UnkShort_0x3C = USF4Utils.ReadInt(false, 0x3C, Data);
-            UnkShort_0x3E = USF4Utils.ReadInt(false, 0x3E, Data);
-            //0x40
-            UnkInt_0x40 = USF4Utils.ReadInt(true, 0x40, Data);
-            UnkInt_0x44 = USF4Utils.ReadInt(true, 0x44, Data);
-            UnkInt_0x48 = USF4Utils.ReadInt(true, 0x48, Data);
-            //END HEADER
-            //Start reading indexes and data
-            for (int i = 0; i < chargeCount; i++)
-            {
-                chargePointers.Add(USF4Utils.ReadInt(false, chargeIndexPointer + i * 0x04, Data));
-                chargeNamePointers.Add(USF4Utils.ReadInt(false, chargeNameIndexPointer + i * 0x04, Data));
-                //Fetch name
-                NameIndex.Add(Encoding.ASCII.GetString(USF4Utils.ReadZeroTermStringToArray(chargeNamePointers[i], Data, Data.Length)));
-                //Read datablock
-                Charges.Add(new SFxTBCMCharge(Data.Slice(chargePointers[i], 0x10), NameIndex.Last()));
-            }
-            for (int i = 0; i < inputMotionCount; i++)
-            {
-                inputMotionPointers.Add(USF4Utils.ReadInt(false, inputMotionIndexPointer + i * 0x04, Data));
-                inputMotionNamePointers.Add(USF4Utils.ReadInt(false, inputMotionNameIndexPointer + i * 0x04, Data));
-                //Fetch name
-                NameIndex.Add(Encoding.ASCII.GetString(USF4Utils.ReadZeroTermStringToArray(inputMotionNamePointers[i], Data, Data.Length)));
-                //Read datablock
-                InputMotions.Add(new SFxTBCMInputMotion(Data.Slice(inputMotionPointers[i], 0x420), NameIndex.Last()));
-            }
-            for (int i = 0; i < moveCount; i++)
-            {
-                movePointers.Add(USF4Utils.ReadInt(false, moveIndexPointer + i * 0x04, Data));
-                moveNamePointers.Add(USF4Utils.ReadInt(false, moveNameIndexPointer + i * 0x04, Data));
-                //Fetch name
-                NameIndex.Add(Encoding.ASCII.GetString(USF4Utils.ReadZeroTermStringToArray(moveNamePointers[i], Data, Data.Length)));
-                //Read datablock
-                Moves.Add(new SFxTBCMMove(Data.Slice(movePointers[i], 0x40),NameIndex.Last(), InputMotions.Select(o => o.Name).ToList()));
-            }
-            for (int i = 0; i < cancelCount; i++)
-            {
-                cancelPointers.Add(USF4Utils.ReadInt(false, cancelIndexPointer + i * 0x04, Data));
-                cancelNamePointers.Add(USF4Utils.ReadInt(false, cancelNameIndexPointer + i * 0x04, Data));
-                //Check if we've got data, read in
-                if (cancelPointers[i] != 0 && cancelNamePointers[i] != 0)
-                {
-                    //Fetch name
-                    NameIndex.Add(Encoding.ASCII.GetString(USF4Utils.ReadZeroTermStringToArray(cancelNamePointers[i], Data, Data.Length)));
-                    //Read datablock
-                    //For now we'll pass more data than necessary, sort it out later TODO sort it out later
-                    Cancels.Add(new SFxTBCMCancel(Data.Slice(cancelPointers[i], 0), NameIndex.Last()));
-                }
-                else //If no data, add an empty name index entry and a blank cancel datablock to keep indexes in order
-                {
-                    NameIndex.Add(string.Empty);
-                    Cancels.Add(new SFxTBCMCancel());
-                }
-            }
         }
 
         public override byte[] GenerateBytes()

@@ -7,6 +7,6 @@ namespace JJsUSF4Library.FileClasses
     /// </summary>
     public class LUA : USF4File
     {
-
+        
     }
 }

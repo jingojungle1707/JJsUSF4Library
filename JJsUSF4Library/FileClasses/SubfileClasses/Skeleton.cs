@@ -9,14 +9,15 @@ namespace JJsUSF4Library.FileClasses.SubfileClasses
 {
     public class Skeleton
     {
-        public int MysteryShort; //I've seen 0x00, 0x01, 0x02, 0x03. EMA and EMO don't always match.
-        public float MysteryFloat1; //These two "floats" might be a checksum to ensure the EMO and EMA skeletons match?
-        public float MysteryFloat2;
+        public int MysteryShort { get; set; } //I've seen 0x00, 0x01, 0x02, 0x03. EMA and EMO don't always match.
+        public float MysteryFloat1 { get; set; } //These two "floats" might be a checksum to ensure the EMO and EMA skeletons match?
+        public float MysteryFloat2 { get; set; }
 
-        public List<Node> Nodes;
-        public List<byte[]> FFList;
-        public List<IKNode> IKNodes;
-        public List<IKDataBlock> IKDataBlocks;
+        public List<Node> Nodes { get; set; }
+
+        public List<byte[]> FFList { get; set; }
+        public List<IKNode> IKNodes { get; set; }
+        public List<IKDataBlock> IKDataBlocks { get; set; }
 
         public List<string> NodeNames
         {
@@ -52,7 +53,7 @@ namespace JJsUSF4Library.FileClasses.SubfileClasses
             FFList = new List<byte[]>();
             IKNodes = new List<IKNode>();
             IKDataBlocks = new List<IKDataBlock>();
-            
+
             List<string> nodeNames = new List<string>();
             List<string> iKNodeNames = new List<string>();
             #endregion
@@ -74,7 +75,7 @@ namespace JJsUSF4Library.FileClasses.SubfileClasses
             br.BaseStream.Seek(offset + 0x36, SeekOrigin.Begin);
             //0x36
             MysteryShort = br.ReadInt16();      //1 REALLY no idea what these are
-            MysteryFloat1 = br.ReadSingle();    //2		Are these some kind of checksum to make sure EMA and EMO skels match?
+            MysteryFloat1 = br.ReadSingle();    //2		Are these some kind of checksum
             MysteryFloat2 = br.ReadSingle();    //3
 
             #endregion
@@ -91,9 +92,7 @@ namespace JJsUSF4Library.FileClasses.SubfileClasses
             //Read nodes
             for (int i = 0; i < nodeCount; i++)
             {
-                Nodes.Add(new Node(br, type, offset + nodeListPointer + i * 0x50, offset + secondaryMatrixPointer + i * 0x40));
-                //Add the name data in
-                Nodes.Last().Name = nodeNames[i];
+                Nodes.Add(new Node(br, type, nodeNames[i], nodeNames, offset + nodeListPointer + i * 0x50, offset + secondaryMatrixPointer + i * 0x40));
             }
             //Read animation mirroring register
             br.BaseStream.Seek(offset + registerPointer, SeekOrigin.Begin);
@@ -129,29 +128,22 @@ namespace JJsUSF4Library.FileClasses.SubfileClasses
             #endregion
         }
 
-        public List<byte> GenerateBytes()
+        private List<byte> GenerateHeader()
         {
             List<byte> data = new List<byte>();
-            //0x00
+
             USF4Utils.AddIntAsBytes(data, Nodes.Count, false);
             USF4Utils.AddIntAsBytes(data, IKNodes.Count, false);
             USF4Utils.AddIntAsBytes(data, IKDataBlocks.Count, true);
-            int nodeListPointerPosition = data.Count;
-            USF4Utils.AddIntAsBytes(data, -1, true);
-            int nameIndexPointerPosition = data.Count;
-            USF4Utils.AddIntAsBytes(data, -1, true);
+            USF4Utils.AddIntAsBytes(data, 0, true);
+            USF4Utils.AddIntAsBytes(data, 0, true);
             //0x10
-            int iKBoneListPointerPosition = data.Count;
-            USF4Utils.AddIntAsBytes(data, -1, true);
-            int iKOBjectNameIndexPointerPosition = data.Count;
-            USF4Utils.AddIntAsBytes(data, -1, true);
-            int registerPointerPosition = data.Count;
-            USF4Utils.AddIntAsBytes(data, -1, true);
-            int secondaryMatrixPointerPosition = data.Count;
-            USF4Utils.AddIntAsBytes(data, -1, true);
+            USF4Utils.AddIntAsBytes(data, 0, true);
+            USF4Utils.AddIntAsBytes(data, 0, true);
+            USF4Utils.AddIntAsBytes(data, 0, true);
+            USF4Utils.AddIntAsBytes(data, 0, true);
             //0x20
-            int iKDataPointerPosition = data.Count;
-            USF4Utils.AddIntAsBytes(data, -1, true);
+            USF4Utils.AddIntAsBytes(data, 0, true);
             USF4Utils.AddZeroToLineEnd(data);
             //0x30
             USF4Utils.AddIntAsBytes(data, 0x00, true); //Padding
@@ -159,36 +151,32 @@ namespace JJsUSF4Library.FileClasses.SubfileClasses
             USF4Utils.AddIntAsBytes(data, MysteryShort, false);
             USF4Utils.AddFloatAsBytes(data, MysteryFloat1);
             USF4Utils.AddFloatAsBytes(data, MysteryFloat2);
+            USF4Utils.AddZeroToLineEnd(data);
+
+            return data;
+        }
+
+        public byte[] GenerateBytes()
+        {
+            List<byte> data = GenerateHeader();
+
+            //All the pointer positions are fixed within the header, so no need to calculate them at runtime
+            int nodeListPointerPosition = 0x08;
+            int nameIndexPointerPosition = 0x0C;
+            //0x10
+            int iKBoneListPointerPosition = 0x10;
+            int iKOBjectNameIndexPointerPosition = 0x14;
+            int registerPointerPosition = 0x18;
+            int secondaryMatrixPointerPosition = 0x1C;
+            int iKDataPointerPosition = 0x20;
+
             //0x40 - Node relationships and main matrices
             USF4Utils.UpdateIntAtPosition(data, nodeListPointerPosition, data.Count);
+            //Fetch node names and store so we don't have to repeatedly access the property
+            List<string> nodeNames = NodeNames;
             for (int i = 0; i < Nodes.Count; i++)
             {
-                USF4Utils.AddSignedShortAsBytes(data, Nodes[i].Parent);
-                USF4Utils.AddSignedShortAsBytes(data, Nodes[i].Child1);
-                USF4Utils.AddSignedShortAsBytes(data, Nodes[i].Sibling);
-                USF4Utils.AddSignedShortAsBytes(data, Nodes[i].Child3);
-                USF4Utils.AddSignedShortAsBytes(data, Nodes[i].Child4);
-                USF4Utils.AddSignedShortAsBytes(data, Nodes[i].BitFlag);
-                USF4Utils.AddFloatAsBytes(data, Nodes[i].PreMatrixFloat);
-
-                //Check if we need NodeMatrix or TransformMatrix
-                Matrix4x4 m = (Type == SkeletonType.EMO) ? Nodes[i].NodeMatrix : Nodes[i].TransformMatrix;
-                USF4Utils.AddFloatAsBytes(data, m.M11);
-                USF4Utils.AddFloatAsBytes(data, m.M12);
-                USF4Utils.AddFloatAsBytes(data, m.M13);
-                USF4Utils.AddFloatAsBytes(data, m.M14);
-                USF4Utils.AddFloatAsBytes(data, m.M21);
-                USF4Utils.AddFloatAsBytes(data, m.M22);
-                USF4Utils.AddFloatAsBytes(data, m.M23);
-                USF4Utils.AddFloatAsBytes(data, m.M24);
-                USF4Utils.AddFloatAsBytes(data, m.M31);
-                USF4Utils.AddFloatAsBytes(data, m.M32);
-                USF4Utils.AddFloatAsBytes(data, m.M33);
-                USF4Utils.AddFloatAsBytes(data, m.M34);
-                USF4Utils.AddFloatAsBytes(data, m.M41);
-                USF4Utils.AddFloatAsBytes(data, m.M42);
-                USF4Utils.AddFloatAsBytes(data, m.M43);
-                USF4Utils.AddFloatAsBytes(data, m.M44);
+                data.AddRange(Nodes[i].GenerateMainBytes(Type, nodeNames));
             }
             //FF Register
             USF4Utils.UpdateIntAtPosition(data, registerPointerPosition, data.Count);
@@ -199,42 +187,26 @@ namespace JJsUSF4Library.FileClasses.SubfileClasses
             //Node Name Index
             USF4Utils.UpdateIntAtPosition(data, nameIndexPointerPosition, data.Count);
             List<int> nodeNameIndexPointerPositions = new List<int>();
-            for (int i = 0; i < NodeNames.Count; i++)
+            for (int i = 0; i < nodeNames.Count; i++)
             {
                 nodeNameIndexPointerPositions.Add(data.Count);
                 USF4Utils.AddIntAsBytes(data, -1, true);
             }
-            for (int i = 0; i < NodeNames.Count; i++)
+            for (int i = 0; i < nodeNames.Count; i++)
             {
                 USF4Utils.UpdateIntAtPosition(data, nodeNameIndexPointerPositions[i], data.Count);
-                data.AddRange(Encoding.ASCII.GetBytes(NodeNames[i]));
+                data.AddRange(Encoding.ASCII.GetBytes(nodeNames[i]));
                 data.Add(0x00);
             }
             USF4Utils.AddZeroToLineEnd(data);
 
-            //Secondary Matrix List TODO Check the secondary matrix position - not sure where it appears
-            //when there's both secondary matrices AND IK data
+            //Inverse skin bind pose matrices
             if (Type == SkeletonType.EMO)
             {
                 USF4Utils.UpdateIntAtPosition(data, secondaryMatrixPointerPosition, data.Count);
                 for (int i = 0; i < Nodes.Count; i++)
                 {
-                    USF4Utils.AddFloatAsBytes(data, Nodes[i].SkinBindPoseMatrix.M11);
-                    USF4Utils.AddFloatAsBytes(data, Nodes[i].SkinBindPoseMatrix.M12);
-                    USF4Utils.AddFloatAsBytes(data, Nodes[i].SkinBindPoseMatrix.M13);
-                    USF4Utils.AddFloatAsBytes(data, Nodes[i].SkinBindPoseMatrix.M14);
-                    USF4Utils.AddFloatAsBytes(data, Nodes[i].SkinBindPoseMatrix.M21);
-                    USF4Utils.AddFloatAsBytes(data, Nodes[i].SkinBindPoseMatrix.M22);
-                    USF4Utils.AddFloatAsBytes(data, Nodes[i].SkinBindPoseMatrix.M23);
-                    USF4Utils.AddFloatAsBytes(data, Nodes[i].SkinBindPoseMatrix.M24);
-                    USF4Utils.AddFloatAsBytes(data, Nodes[i].SkinBindPoseMatrix.M31);
-                    USF4Utils.AddFloatAsBytes(data, Nodes[i].SkinBindPoseMatrix.M32);
-                    USF4Utils.AddFloatAsBytes(data, Nodes[i].SkinBindPoseMatrix.M33);
-                    USF4Utils.AddFloatAsBytes(data, Nodes[i].SkinBindPoseMatrix.M34);
-                    USF4Utils.AddFloatAsBytes(data, Nodes[i].SkinBindPoseMatrix.M41);
-                    USF4Utils.AddFloatAsBytes(data, Nodes[i].SkinBindPoseMatrix.M42);
-                    USF4Utils.AddFloatAsBytes(data, Nodes[i].SkinBindPoseMatrix.M43);
-                    USF4Utils.AddFloatAsBytes(data, Nodes[i].SkinBindPoseMatrix.M44);
+                    USF4Utils.AddMatrix4x4AsBytes(data, Nodes[i].InverseSkinBindPoseMatrix);
                 }
             }
 
@@ -294,7 +266,7 @@ namespace JJsUSF4Library.FileClasses.SubfileClasses
             }
             data.Add(0x00);
 
-            return data;
+            return data.ToArray();
         }
     }
 }

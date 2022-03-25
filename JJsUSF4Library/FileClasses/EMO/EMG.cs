@@ -111,11 +111,5 @@ namespace JJsUSF4Library.FileClasses
 
             return data;
         }
-
-        public override void DeleteSubfile(int index)
-        {
-            Models.RemoveAt(index);
-            GenerateBytes();
-        }
     }
 }

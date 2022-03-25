@@ -1,5 +1,6 @@
 ﻿using System.Collections.Generic;
 using System.IO;
+using System.Linq;
 using System.Text;
 
 namespace JJsUSF4Library.FileClasses.ScriptClasses
@@ -9,6 +10,10 @@ namespace JJsUSF4Library.FileClasses.ScriptClasses
         public string Name;
         public int UnkShort0_0x00;
         public List<SFxTScript> Scripts;
+        public List<string> ScriptNames
+        {
+            get { return Scripts.Select(o => o.Name).ToList(); }
+        }
 
         public ScriptFile()
         {
