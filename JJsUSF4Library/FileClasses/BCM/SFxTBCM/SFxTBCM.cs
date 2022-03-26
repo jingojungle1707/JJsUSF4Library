@@ -338,7 +338,7 @@ namespace JJsUSF4Library.FileClasses
                 for (int j = 0; j < InputMotions[i].InputDetails.Count; j++)
                 {
                     //inputMotionDetailsPointerPositions.Add(Data.Count);
-                    USF4Utils.AddIntAsBytes(Data, InputMotions[i].InputDetails.Count * 4 + i * 0x104, true);
+                    USF4Utils.AddIntAsBytes(Data, InputMotions[i].InputDetails.Count * 4 + j * 0x104, true);
                 }
                 for (int j = 0; j < InputMotions[i].InputDetails.Count; j++)
                 {

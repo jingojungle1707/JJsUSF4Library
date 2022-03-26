@@ -58,6 +58,7 @@ namespace JJsUSF4Library.FileClasses.ScriptClasses
             NONE = 0x00,
             CLOSE = 0x01,
             FAR = 0x02,
+            HIGH = 0x03
         }
         [Flags]
         public enum InputFlag
