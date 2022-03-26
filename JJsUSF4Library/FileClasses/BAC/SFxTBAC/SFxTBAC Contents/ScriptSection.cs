@@ -338,46 +338,50 @@ namespace JJsUSF4Library.FileClasses.ScriptClasses
                 {
                     public int
                         Type,
-                        UnkShort1_0x02,
-                        UnkShort2_0x04,
+                        UnkByte1_0x01,
+                        UnkShort2_0x02,
                         Script,
-                        UnkShort4_0x08,
-                        TargetTick;
+                        UnkShort4_0x06,
+                        TargetTick,
+                        UnkShort6_0x0B;
                     public FlowCommand() { }
                     public override void ReadCommandDataBlock(BinaryReader br, int startTick, int endTick)
                     {
                         StartTick = startTick;
                         EndTick = endTick;
-                        Type = br.ReadInt16();
-                        UnkShort1_0x02 = br.ReadInt16();
-                        UnkShort2_0x04 = br.ReadInt16();
+                        Type = br.ReadByte();
+                        UnkByte1_0x01 = br.ReadByte();
+                        UnkShort2_0x02 = br.ReadInt16();
                         Script = br.ReadInt16();
-                        UnkShort4_0x08 = br.ReadInt16();
+                        UnkShort4_0x06 = br.ReadInt16();
                         TargetTick = br.ReadInt16();
+                        UnkShort6_0x0B = br.ReadInt16();
                     }
                     public FlowCommand(byte[] Data, int startTick, int endTick)
                     {
                         StartTick = startTick;
                         EndTick = endTick;
 
-                        Type = USF4Utils.ReadInt(false, 0x00, Data);
-                        UnkShort1_0x02 = USF4Utils.ReadInt(false, 0x02, Data);
-                        UnkShort2_0x04 = USF4Utils.ReadInt(false, 0x04, Data);
-                        Script = USF4Utils.ReadInt(false, 0x06, Data);
-                        UnkShort4_0x08 = USF4Utils.ReadInt(false, 0x08, Data);
+                        Type = Data[0];
+                        UnkByte1_0x01 = Data[1];
+                        UnkShort2_0x02 = USF4Utils.ReadInt(false, 0x02, Data);
+                        Script = USF4Utils.ReadInt(false, 0x04, Data);
+                        UnkShort4_0x06 = USF4Utils.ReadInt(false, 0x06, Data);
                         TargetTick = USF4Utils.ReadInt(false, 0x0A, Data);
+                        UnkShort6_0x0B = USF4Utils.ReadInt(false, 0x0B, Data);
                     }
 
                     public override byte[] GenerateDataBlockBytes()
                     {
                         List<byte> Data = new List<byte>();
 
-                        USF4Utils.AddIntAsBytes(Data, Type, false);
-                        USF4Utils.AddIntAsBytes(Data, UnkShort1_0x02, false);
-                        USF4Utils.AddIntAsBytes(Data, UnkShort2_0x04, false);
-                        USF4Utils.AddIntAsBytes(Data, Script, false);
-                        USF4Utils.AddIntAsBytes(Data, UnkShort4_0x08, false);
-                        USF4Utils.AddIntAsBytes(Data, TargetTick, false);
+                        Data.Add((byte)Type); //1
+                        Data.Add((byte)UnkByte1_0x01); //2
+                        USF4Utils.AddIntAsBytes(Data, UnkShort2_0x02, false); //3-4
+                        USF4Utils.AddIntAsBytes(Data, Script, false); //5-6
+                        USF4Utils.AddIntAsBytes(Data, UnkShort4_0x06, false); //7-8
+                        USF4Utils.AddIntAsBytes(Data, TargetTick, false); //9-A
+                        USF4Utils.AddIntAsBytes(Data, UnkShort6_0x0B, false); //B-C
 
                         return Data.ToArray();
                     }
