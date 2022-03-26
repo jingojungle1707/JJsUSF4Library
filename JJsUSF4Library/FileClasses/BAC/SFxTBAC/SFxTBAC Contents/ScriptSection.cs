@@ -464,7 +464,7 @@ namespace JJsUSF4Library.FileClasses.ScriptClasses
                         StartTick = startTick;
                         EndTick = endTick;
                         Force = br.ReadSingle();
-                        Flags = br.ReadInt32();
+                        Flags = br.ReadInt16();
                         UnkShort2_0x06 = br.ReadInt16();
                         UnkShort3_0x08 = br.ReadInt16();
                         UnkShort4_0x0A = br.ReadInt16();
