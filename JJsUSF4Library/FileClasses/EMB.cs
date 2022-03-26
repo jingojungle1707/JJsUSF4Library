@@ -56,7 +56,7 @@ namespace JJsUSF4Library.FileClasses
                 USF4Utils.AddZeroToLineEnd(data);
             }
 
-            for (int i = 0; i < FileNames.Count; i++)
+            for (int i = 0; i < Files.Count; i++)
             {
                 USF4Utils.UpdateIntAtPosition(data, fileNamePointerPositions[i], data.Count);
                 data.AddRange(Encoding.ASCII.GetBytes(Files[i].Name));
@@ -86,6 +86,7 @@ namespace JJsUSF4Library.FileClasses
             List<int> fileLengthsList = new List<int>();
             List<int> filePointersList = new List<int>();
             List<int> fileNamePointersList = new List<int>();
+            List<string> fileNames = new List<string>();
             #endregion
 
             #region Read Header
@@ -108,7 +109,7 @@ namespace JJsUSF4Library.FileClasses
             }
             else
             {
-                for (int i = 0; i < numberOfFiles; i++) FileNames.Add($"{Name}_DDS{i:D2}");
+                for (int i = 0; i < numberOfFiles; i++) fileNames.Add($"{Name}_DDS{i:D2}");
             }
             #endregion
 
@@ -119,7 +120,7 @@ namespace JJsUSF4Library.FileClasses
             for (int i = 0; i < fileNamePointersList.Count; i++)
             {
                 br.BaseStream.Seek(fileNamePointersList[i] + offset, SeekOrigin.Begin);
-                FileNames.Add(USF4Utils.ReadZString(br));
+                fileNames.Add(USF4Utils.ReadZString(br));
             }
 
             #endregion
@@ -132,7 +133,7 @@ namespace JJsUSF4Library.FileClasses
                 USF4File file = USF4Methods.FetchClass((USF4Methods.FileType)br.ReadInt32());
                 //USF4File file = USF4Methods.CheckFile(br.ReadBytes(4));
                 file.ReadFromStream(br, fileListPointer + i * 8 + filePointersList[i] + offset, fileLengthsList[i]);
-                file.Name = FileNames[i];
+                file.Name = fileNames[i];
                 Files.Add(file);
             }
             #endregion
