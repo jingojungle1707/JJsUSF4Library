@@ -2,14 +2,17 @@
 using System.IO;
 using System.Linq;
 using System.Text;
+using System.Xml.Serialization;
 
 namespace JJsUSF4Library.FileClasses.ScriptClasses
 {
-    public partial class ScriptFile
+    public class ScriptFile
     {
         public string Name;
         public int UnkShort0_0x00;
+        [XmlIgnore]
         public List<SFxTScript> Scripts;
+        [XmlIgnore]
         public List<string> ScriptNames
         {
             get { return Scripts.Select(o => o.Name).ToList(); }
@@ -17,7 +20,7 @@ namespace JJsUSF4Library.FileClasses.ScriptClasses
 
         public ScriptFile()
         {
-
+            Scripts = new List<SFxTScript>();
         }
 
         public ScriptFile(BinaryReader br, string name, int offset = 0)
