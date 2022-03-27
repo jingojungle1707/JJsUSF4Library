@@ -44,19 +44,7 @@ namespace JJsUSF4Library.FileClasses.ScriptClasses
             br.BaseStream.Seek(offset + commandDatasPointer, SeekOrigin.Begin);
             for (int i = 0; i < commandCount; i++)
             {
-                Commands.Add(new Command(br, (Command.COMMANDTYPE)Type, startTicks[i], endTicks[i]));
-            }
-            //Read params
-            for (int i = 0; i < commandCount; i++)
-            {
-                if (Commands[i].CommandData.ParamsCount > 0)
-                {
-                    Commands[i].CommandData.Params = new List<int>();
-                    for (int j = 0; j < Commands[i].CommandData.ParamsCount; j++)
-                    {
-                        Commands[i].CommandData.Params.Add(br.ReadInt32());
-                    }
-                }
+                Commands.Add(new Command(br, Type, startTicks[i], endTicks[i]));
             }
         }
 
@@ -316,17 +304,26 @@ namespace JJsUSF4Library.FileClasses.ScriptClasses
 
             public class CommandDataBlock
             {
-                public int
-                    StartTick,
-                    EndTick;
+                public int StartTick { get; set; }
+                public int EndTick {get; set; }
 
-                public List<int> Params;
-                public int ParamsCount;
-                public int ParamsPointer;
+                public List<int> Params { get; set; }
 
                 public virtual void ReadCommandDataBlock(BinaryReader br, int startTick, int endTick)
                 {
 
+                }
+
+                public virtual void ReadParamData(BinaryReader br, int paramsCount, int globalPointer)
+                {
+                    int startOffset = (int)br.BaseStream.Position;
+                    Params = new List<int>();
+                    br.BaseStream.Seek(globalPointer, SeekOrigin.Begin);
+                    for (int i = 0; i < paramsCount; i++)
+                    {
+                        Params.Add(br.ReadInt32());
+                    }
+                    br.BaseStream.Seek(startOffset, SeekOrigin.Begin);
                 }
 
                 public virtual byte[] GenerateDataBlockBytes()
@@ -357,17 +354,20 @@ namespace JJsUSF4Library.FileClasses.ScriptClasses
                     public FlowCommand() { }
                     public override void ReadCommandDataBlock(BinaryReader br, int startTick, int endTick)
                     {
-                        Params = new List<int>();
-
+                        int startOffset = (int)br.BaseStream.Position;
                         StartTick = startTick;
                         EndTick = endTick;
                         Type = (FlowType)br.ReadByte();
                         UnkByte1_0x01 = br.ReadByte();
-                        ParamsCount = br.ReadByte();
+                        int paramsCount = br.ReadByte();
                         UnkByte3_0x03 = br.ReadByte();
                         Script = br.ReadInt16();
                         UnkShort4_0x06 = br.ReadInt16();
-                        ParamsPointer = br.ReadInt32();
+                        int paramsPointer = br.ReadInt32();
+
+                        //Read params
+                        if (paramsCount > 0) ReadParamData(br, paramsCount, paramsPointer + startOffset);
+                        
                     }
                     public FlowCommand(byte[] Data, int startTick, int endTick)
                     {
@@ -378,15 +378,15 @@ namespace JJsUSF4Library.FileClasses.ScriptClasses
 
                         Type = (FlowType)Data[0];
                         UnkByte1_0x01 = Data[1];
-                        ParamsCount = Data[2];
+                        int paramsCount = Data[2];
                         UnkByte3_0x03 = Data[3];
                         Script = USF4Utils.ReadInt(false, 0x04, Data);
                         UnkShort4_0x06 = USF4Utils.ReadInt(false, 0x06, Data);
-                        ParamsPointer = USF4Utils.ReadInt(true, 0x0A, Data);
+                        int paramsPointer = USF4Utils.ReadInt(true, 0x0A, Data);
 
-                        for (int i = 0; i < ParamsCount; i++)
+                        for (int i = 0; i < paramsCount; i++)
                         {
-                            Params.Add(USF4Utils.ReadInt(true, ParamsPointer + i * 0x04, Data));
+                            Params.Add(USF4Utils.ReadInt(true, paramsPointer + i * 0x04, Data));
                         }
                     }
 
@@ -571,22 +571,25 @@ namespace JJsUSF4Library.FileClasses.ScriptClasses
                         EndTick = endTick;
                         Type = Data[0x00];
                         UnkShort1_0x01 = USF4Utils.ReadInt(false, 0x01, Data);
-                        ParamsCount = Data[0x03];
-                        ParamsPointer = USF4Utils.ReadInt(true, 0x04, Data);
+                        int paramsCount = Data[0x03];
+                        int paramsPointer = USF4Utils.ReadInt(true, 0x04, Data);
 
-                        for (int i = 0; i < ParamsCount; i++)
+                        for (int i = 0; i < paramsCount; i++)
                         {
-                            Params.Add(USF4Utils.ReadInt(true, ParamsPointer + i * 0x04, Data));
+                            Params.Add(USF4Utils.ReadInt(true, paramsPointer + i * 0x04, Data));
                         }
                     }
                     public override void ReadCommandDataBlock(BinaryReader br, int startTick, int endTick)
                     {
+                        int startOffset = (int)br.BaseStream.Position;
                         StartTick = startTick;
                         EndTick = endTick;
                         Type = br.ReadByte();
                         UnkShort1_0x01 = br.ReadInt16();
-                        ParamsCount = br.ReadByte();
-                        ParamsPointer = br.ReadInt32();
+                        int paramsCount = br.ReadByte();
+                        int paramsPointer = br.ReadInt32();
+
+                        if (paramsCount > 0) ReadParamData(br, paramsCount, paramsPointer + startOffset);
                     }
                     public override byte[] GenerateDataBlockBytes()
                     {
@@ -614,22 +617,25 @@ namespace JJsUSF4Library.FileClasses.ScriptClasses
                         EndTick = endTick;
                         UnkByte0_0x00 = Data[0x00];
                         UnkShort1_0x01 = USF4Utils.ReadInt(false, 0x01, Data);
-                        ParamsCount = Data[0x03];
-                        ParamsPointer = USF4Utils.ReadInt(true, 0x04, Data);
+                        int paramsCount = Data[0x03];
+                        int paramsPointer = USF4Utils.ReadInt(true, 0x04, Data);
 
-                        for (int i = 0; i < ParamsCount; i++)
+                        for (int i = 0; i < paramsCount; i++)
                         {
-                            Params.Add(USF4Utils.ReadInt(true, ParamsPointer + i * 0x04, Data));
+                            Params.Add(USF4Utils.ReadInt(true, paramsPointer + i * 0x04, Data));
                         }
                     }
                     public override void ReadCommandDataBlock(BinaryReader br, int startTick, int endTick)
                     {
+                        int startOffset = (int)br.BaseStream.Position;
                         StartTick = startTick;
                         EndTick = endTick;
                         UnkByte0_0x00 = br.ReadByte();
                         UnkShort1_0x01 = br.ReadInt16();
-                        ParamsCount = br.ReadByte();
-                        ParamsPointer = br.ReadInt32();
+                        int paramsCount = br.ReadByte();
+                        int paramsPointer = br.ReadInt32();
+
+                        if (paramsCount > 0) ReadParamData(br, paramsCount, paramsPointer + startOffset);
                     }
                     public override byte[] GenerateDataBlockBytes()
                     {
@@ -1021,22 +1027,25 @@ namespace JJsUSF4Library.FileClasses.ScriptClasses
                         EndTick = endTick;
                         ID = USF4Utils.ReadInt(false, 0x00, Data);
                         File = Data[2];
-                        ParamsCount = Data[3];
-                        ParamsPointer = USF4Utils.ReadInt(true, 0x04, Data);
+                        int paramsCount = Data[3];
+                        int paramsPointer = USF4Utils.ReadInt(true, 0x04, Data);
 
-                        for (int i = 0; i < ParamsCount; i++)
+                        for (int i = 0; i < paramsCount; i++)
                         {
-                            Params.Add(USF4Utils.ReadInt(true, ParamsPointer + i * 0x04, Data));
+                            Params.Add(USF4Utils.ReadInt(true, paramsPointer + i * 0x04, Data));
                         }
                     }
                     public override void ReadCommandDataBlock(BinaryReader br, int startTick, int endTick)
                     {
+                        int startOffset = (int)br.BaseStream.Position;
                         StartTick = startTick;
                         EndTick = endTick;
                         ID = br.ReadInt16();
                         File = br.ReadByte();
-                        ParamsCount = br.ReadByte();
-                        ParamsPointer = br.ReadInt32();
+                        int paramsCount = br.ReadByte();
+                        int paramsPointer = br.ReadInt32();
+
+                        if (paramsCount > 0) ReadParamData(br, paramsCount, paramsPointer + startOffset);
                     }
                     public override byte[] GenerateDataBlockBytes()
                     {
@@ -1064,22 +1073,25 @@ namespace JJsUSF4Library.FileClasses.ScriptClasses
                         EndTick = endTick;
                         ID = USF4Utils.ReadInt(false, 0x00, Data);
                         File = Data[0x02];
-                        ParamsCount = Data[0x03];
-                        ParamsPointer = USF4Utils.ReadInt(true, 0x04, Data);
+                        int paramsCount = Data[0x03];
+                        int paramsPointer = USF4Utils.ReadInt(true, 0x04, Data);
 
-                        for (int i = 0; i < ParamsCount; i++)
+                        for (int i = 0; i < paramsCount; i++)
                         {
-                            Params.Add(USF4Utils.ReadInt(true, ParamsPointer + i * 0x04, Data));
+                            Params.Add(USF4Utils.ReadInt(true, paramsPointer + i * 0x04, Data));
                         }
                     }
                     public override void ReadCommandDataBlock(BinaryReader br, int startTick, int endTick)
                     {
+                        int startOffset = (int)br.BaseStream.Position;
                         StartTick = startTick;
                         EndTick = endTick;
                         ID = br.ReadInt16();
                         File = br.ReadByte();
-                        ParamsCount = br.ReadByte();
-                        ParamsPointer = br.ReadInt32();
+                        int paramsCount = br.ReadByte();
+                        int paramsPointer = br.ReadInt32();
+
+                        if (paramsCount > 0) ReadParamData(br, paramsCount, paramsPointer + startOffset);
                     }
                     public override byte[] GenerateDataBlockBytes()
                     {

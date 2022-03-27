@@ -124,9 +124,9 @@ namespace JJsUSF4Library.FileClasses.ScriptClasses
             HitStun = br.ReadInt16();
             HitStun2 = br.ReadInt16();
             UnkShort10_0x18 = br.ReadInt16();
-#if DEBUG
-            Debug.WriteLine($"Type: {Type}; EffectType: {Effect}; ScriptID: {Script}; Flags: {Flags}; Short0x18: {UnkShort10_0x18}");
-#endif
+//#if DEBUG
+//            Debug.WriteLine($"Type: {Type}; EffectType: {Effect}; ScriptID: {Script}; Flags: {Flags}; Short0x18: {UnkShort10_0x18}");
+//#endif
 
             int offsetCommandCount = br.ReadByte();
             int hitEffectParamCount = br.ReadByte();
@@ -138,22 +138,14 @@ namespace JJsUSF4Library.FileClasses.ScriptClasses
             int offsetCommandPointer = br.ReadInt32();
             int hitEffectParamPointer = br.ReadInt32();
 
-            br.BaseStream.Seek(offset + offsetCommandPointer, SeekOrigin.Begin);
             for (int i = 0; i < offsetCommandCount; i++)
             {
                 //Each offset command is length 0x08
                 OffsetCommands.Add(new OffsetCommand(br, offset + offsetCommandPointer + i * 0x08));
             }
-            br.BaseStream.Seek(offset + hitEffectParamPointer, SeekOrigin.Begin);
             for (int i = 0; i < hitEffectParamCount; i++)
             {
-                HitEffectParams.Add(new HitEffectParam()
-                {
-                    UnkShort0_0x00 = br.ReadInt16(),
-                    UnkShort1_0x02 = br.ReadInt16(),
-                    UnkShort2_0x04 = br.ReadInt16(),
-                    UnkShort3_0x06 = br.ReadInt16(),
-                });
+                HitEffectParams.Add(new HitEffectParam(br, offset + hitEffectParamPointer + i * 0x08));
             }
         }
 
@@ -167,7 +159,7 @@ namespace JJsUSF4Library.FileClasses.ScriptClasses
 
             public OffsetCommand()
             {
-
+                Params = new List<int>();
             }
             public OffsetCommand(BinaryReader br, int offset = 0)
             {
@@ -188,9 +180,28 @@ namespace JJsUSF4Library.FileClasses.ScriptClasses
         {
             public int
                 UnkShort0_0x00,
-                UnkShort1_0x02,
-                UnkShort2_0x04,
-                UnkShort3_0x06;
+                UnkByte1_0x02;
+
+            public List<int> Params;
+
+            public HitEffectParam()
+            {
+                Params = new List<int>();
+            }
+
+            public HitEffectParam(BinaryReader br, int offset = 0)
+            {
+                Params = new List<int>();
+                br.BaseStream.Seek(offset, SeekOrigin.Begin);
+
+                UnkShort0_0x00 = br.ReadInt16();
+                UnkByte1_0x02 = br.ReadByte();
+                int paramsCount = br.ReadByte();
+                int paramsPointer = br.ReadInt32();
+
+                br.BaseStream.Seek(paramsPointer + offset, SeekOrigin.Begin);
+                for (int i = 0; i < paramsCount; i++) Params.Add(br.ReadInt32());
+            }
         }
     }
 }
