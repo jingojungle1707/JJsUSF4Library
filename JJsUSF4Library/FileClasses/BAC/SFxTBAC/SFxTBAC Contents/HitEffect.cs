@@ -68,15 +68,26 @@ namespace JJsUSF4Library.FileClasses.ScriptClasses
                 if (hed.OffsetCommands.Count > 0)
                 {
                     USF4Utils.UpdateIntAtPosition(data, offsetCommandPointerPosition, data.Count - hitEffectDataStartOS);
+
+                    List<int> paramPointerPositions = new List<int>();
                     for (int j = 0; j < hed.OffsetCommands.Count; j++)
                     {
                         HitEffectData.OffsetCommand ofc = hed.OffsetCommands[j];
                         USF4Utils.AddIntAsBytes(data, ofc.UnkShort0_0x00, false);
                         data.Add(ofc.UnkByte1_0x02);
                         data.Add((byte)ofc.Params.Count);
-                        USF4Utils.AddIntAsBytes(data, 0x08, true); //Params pointer, should always be 8?
-
-                        for (int k = 0; k < ofc.Params.Count; k++) USF4Utils.AddIntAsBytes(data, ofc.Params[k], true);
+                        paramPointerPositions.Add(data.Count);
+                        USF4Utils.AddIntAsBytes(data, 0, true); //params pointer, to be updated later
+                    }
+                    //Write OffsetCommand Params
+                    for (int j = 0; j < hed.OffsetCommands.Count; j++)
+                    {
+                        HitEffectData.OffsetCommand ofc = hed.OffsetCommands[j];
+                        USF4Utils.UpdateIntAtPosition(data, paramPointerPositions[j], data.Count - (paramPointerPositions[j] - 4));
+                        for (int k = 0; k < ofc.Params.Count; k++)
+                        {
+                            USF4Utils.AddIntAsBytes(data, ofc.Params[k], true);
+                        }
                     }
                 }
                 //Write HitEffectParams

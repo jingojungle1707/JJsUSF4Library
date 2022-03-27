@@ -1,6 +1,7 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.IO;
+using System.Linq;
 using System.Xml.Serialization;
 
 namespace JJsUSF4Library.FileClasses.ScriptClasses
@@ -88,13 +89,23 @@ namespace JJsUSF4Library.FileClasses.ScriptClasses
             {
                 Data.AddRange(Commands[i].CommandData.GenerateDataBlockBytes());
             }
-            if (Type == (Command.COMMANDTYPE)0x05 || Type == (Command.COMMANDTYPE)0x06 || Type == (Command.COMMANDTYPE)0x0D) //ETC, Unk6 & GFX are the types that use params
+            //Check for types that contain params
+            if (new Command.COMMANDTYPE[] { 
+                Command.COMMANDTYPE.Flow, 
+                Command.COMMANDTYPE.ETC, 
+                Command.COMMANDTYPE.Unk6, 
+                Command.COMMANDTYPE.SFX, 
+                Command.COMMANDTYPE.GFX }
+                .Contains(Type))
             {
+                int commandLength = (Type == Command.COMMANDTYPE.Flow) ? 0x0C : 0x08;
+                int commandOffset = (Type == Command.COMMANDTYPE.Flow) ? 0x08 : 0x04;
+
                 for (int i = 0; i < Commands.Count; i++)
                 {
                     if (Commands[i].CommandData.Params != null && Commands[i].CommandData.Params.Count > 0)
                     {
-                        USF4Utils.UpdateIntAtPosition(Data, i * 8 + 4, Data.Count - i * 8);
+                        USF4Utils.UpdateIntAtPosition(Data, i * commandLength + commandOffset, Data.Count - i * commandLength);
                         Data.AddRange(Commands[i].CommandData.GenerateParamBytes());
                     }
                 }
@@ -311,6 +322,7 @@ namespace JJsUSF4Library.FileClasses.ScriptClasses
 
                 public List<int> Params;
                 public int ParamsCount;
+                public int ParamsPointer;
 
                 public virtual void ReadCommandDataBlock(BinaryReader br, int startTick, int endTick)
                 {
@@ -336,39 +348,46 @@ namespace JJsUSF4Library.FileClasses.ScriptClasses
 
                 public class FlowCommand : CommandDataBlock
                 {
+                    public FlowType Type;
                     public int
-                        Type,
                         UnkByte1_0x01,
-                        UnkShort2_0x02,
+                        UnkByte3_0x03,
                         Script,
-                        UnkShort4_0x06,
-                        TargetTick,
-                        UnkShort6_0x0B;
+                        UnkShort4_0x06;
                     public FlowCommand() { }
                     public override void ReadCommandDataBlock(BinaryReader br, int startTick, int endTick)
                     {
+                        Params = new List<int>();
+
                         StartTick = startTick;
                         EndTick = endTick;
-                        Type = br.ReadByte();
+                        Type = (FlowType)br.ReadByte();
                         UnkByte1_0x01 = br.ReadByte();
-                        UnkShort2_0x02 = br.ReadInt16();
+                        ParamsCount = br.ReadByte();
+                        UnkByte3_0x03 = br.ReadByte();
                         Script = br.ReadInt16();
                         UnkShort4_0x06 = br.ReadInt16();
-                        TargetTick = br.ReadInt16();
-                        UnkShort6_0x0B = br.ReadInt16();
+                        ParamsPointer = br.ReadInt32();
                     }
                     public FlowCommand(byte[] Data, int startTick, int endTick)
                     {
+                        Params = new List<int>();
+
                         StartTick = startTick;
                         EndTick = endTick;
 
-                        Type = Data[0];
+                        Type = (FlowType)Data[0];
                         UnkByte1_0x01 = Data[1];
-                        UnkShort2_0x02 = USF4Utils.ReadInt(false, 0x02, Data);
+                        ParamsCount = Data[2];
+                        UnkByte3_0x03 = Data[3];
                         Script = USF4Utils.ReadInt(false, 0x04, Data);
                         UnkShort4_0x06 = USF4Utils.ReadInt(false, 0x06, Data);
-                        TargetTick = USF4Utils.ReadInt(false, 0x0A, Data);
-                        UnkShort6_0x0B = USF4Utils.ReadInt(false, 0x0B, Data);
+                        ParamsPointer = USF4Utils.ReadInt(true, 0x0A, Data);
+
+                        for (int i = 0; i < ParamsCount; i++)
+                        {
+                            Params.Add(USF4Utils.ReadInt(true, ParamsPointer + i * 0x04, Data));
+                        }
                     }
 
                     public override byte[] GenerateDataBlockBytes()
@@ -377,13 +396,33 @@ namespace JJsUSF4Library.FileClasses.ScriptClasses
 
                         Data.Add((byte)Type); //1
                         Data.Add((byte)UnkByte1_0x01); //2
-                        USF4Utils.AddIntAsBytes(Data, UnkShort2_0x02, false); //3-4
+                        Data.Add((byte)(Params == null ? 0 : Params.Count)); //3
+                        Data.Add((byte)UnkByte3_0x03); //4
                         USF4Utils.AddIntAsBytes(Data, Script, false); //5-6
                         USF4Utils.AddIntAsBytes(Data, UnkShort4_0x06, false); //7-8
-                        USF4Utils.AddIntAsBytes(Data, TargetTick, false); //9-A
-                        USF4Utils.AddIntAsBytes(Data, UnkShort6_0x0B, false); //B-C
+                        USF4Utils.AddIntAsBytes(Data, 0, true); //9-A-B-C Params pointer, need to overwrite it later
 
                         return Data.ToArray();
+                    }
+
+                    public enum FlowType
+                    {
+                        ALWAYS = 0x00,
+                        UNK0x01 = 0x01,
+                        HIT = 0x02,
+                        UNK0x03 = 0x03, //UNK
+                        UNK0x04 = 0x04, //UNK
+                        HIT2 = 0x05,
+                        UNK0x06 = 0x06,
+                        UNK0x07 = 0x07,
+                        UNK0x08 = 0x08,
+                        LAND = 0x09,
+                        WALL = 0x0A,
+                        UNK0x0B = 0x0B,
+                        INPUT = 0x0C,
+                        UNK0x0D = 0x0D,
+                        UNK0x0E = 0x0E,
+                        UNK0x0F = 0x0F,
                     }
                 }
                 public class SpeedCommand : CommandDataBlock
@@ -522,7 +561,6 @@ namespace JJsUSF4Library.FileClasses.ScriptClasses
                 {
                     public byte Type;
                     public int UnkShort1_0x01;
-                    public int ParamsPointer;
 
                     public ETCCommand() { }
                     public ETCCommand(byte[] Data, int startTick, int endTick)
@@ -555,7 +593,7 @@ namespace JJsUSF4Library.FileClasses.ScriptClasses
                         List<byte> Data = new List<byte>();
                         Data.Add(Type);
                         USF4Utils.AddIntAsBytes(Data, UnkShort1_0x01, false);
-                        Data.Add((byte)Params.Count);
+                        Data.Add((byte)(Params == null ? 0 : Params.Count));
                         USF4Utils.AddIntAsBytes(Data, 0, true); //Params pointer, need to overwrite it later
 
                         return Data.ToArray();
@@ -566,7 +604,6 @@ namespace JJsUSF4Library.FileClasses.ScriptClasses
                 {
                     public byte UnkByte0_0x00;
                     public int UnkShort1_0x01;
-                    public int ParamsPointer;
 
                     public Unk6Command() { }
                     public Unk6Command(byte[] Data, int startTick, int endTick)
@@ -599,7 +636,7 @@ namespace JJsUSF4Library.FileClasses.ScriptClasses
                         List<byte> Data = new List<byte>();
                         Data.Add(UnkByte0_0x00);
                         USF4Utils.AddIntAsBytes(Data, UnkShort1_0x01, false);
-                        Data.Add((byte)Params.Count);
+                        Data.Add((byte)(Params == null ? 0 : Params.Count));
                         USF4Utils.AddIntAsBytes(Data, 0, true); //Params pointer, need to overwrite it later
 
                         return Data.ToArray();
@@ -972,38 +1009,43 @@ namespace JJsUSF4Library.FileClasses.ScriptClasses
                 public class SFXCommand : CommandDataBlock
                 {
                     public int
-                        ID,
-                        File,
-                        UnkShort2_0x04,
-                        UnkShort3_0x06;
+                        ID, //short
+                        File; //byte
 
                     public SFXCommand() { }
                     public SFXCommand(byte[] Data, int startTick, int endTick)
                     {
+                        Params = new List<int>();
+
                         StartTick = startTick;
                         EndTick = endTick;
                         ID = USF4Utils.ReadInt(false, 0x00, Data);
-                        File = USF4Utils.ReadInt(false, 0x02, Data);
-                        UnkShort2_0x04 = USF4Utils.ReadInt(false, 0x04, Data);
-                        UnkShort3_0x06 = USF4Utils.ReadInt(false, 0x06, Data);
+                        File = Data[2];
+                        ParamsCount = Data[3];
+                        ParamsPointer = USF4Utils.ReadInt(true, 0x04, Data);
+
+                        for (int i = 0; i < ParamsCount; i++)
+                        {
+                            Params.Add(USF4Utils.ReadInt(true, ParamsPointer + i * 0x04, Data));
+                        }
                     }
                     public override void ReadCommandDataBlock(BinaryReader br, int startTick, int endTick)
                     {
                         StartTick = startTick;
                         EndTick = endTick;
                         ID = br.ReadInt16();
-                        File = br.ReadInt16();
-                        UnkShort2_0x04 = br.ReadInt16();
-                        UnkShort3_0x06 = br.ReadInt16();
+                        File = br.ReadByte();
+                        ParamsCount = br.ReadByte();
+                        ParamsPointer = br.ReadInt32();
                     }
                     public override byte[] GenerateDataBlockBytes()
                     {
                         List<byte> Data = new List<byte>();
 
                         USF4Utils.AddIntAsBytes(Data, ID, false);
-                        USF4Utils.AddIntAsBytes(Data, File, false);
-                        USF4Utils.AddIntAsBytes(Data, UnkShort2_0x04, false);
-                        USF4Utils.AddIntAsBytes(Data, UnkShort3_0x06, false);
+                        Data.Add((byte)File);
+                        Data.Add((byte)(Params == null ? 0 : Params.Count));
+                        USF4Utils.AddIntAsBytes(Data, 0, true); //params pointer
 
                         return Data.ToArray();
                     }
@@ -1012,7 +1054,6 @@ namespace JJsUSF4Library.FileClasses.ScriptClasses
                 {
                     public int ID; //Short
                     public byte File;
-                    public int ParamsPointer;
 
                     public GFXCommand() { }
                     public GFXCommand(byte[] Data, int startTick, int endTick)
@@ -1046,7 +1087,7 @@ namespace JJsUSF4Library.FileClasses.ScriptClasses
 
                         USF4Utils.AddIntAsBytes(Data, ID, false);
                         Data.Add(File);
-                        Data.Add((byte)Params.Count);
+                        Data.Add((byte)(Params == null ? 0 : Params.Count));
                         USF4Utils.AddIntAsBytes(Data, 0, true); //Params pointer, need to overwrite it later
 
                         return Data.ToArray();
