@@ -91,7 +91,7 @@ namespace JJsUSF4Library.FileClasses
                 else
                 {
 #if DEBUG
-                    Debug.WriteLine($"HitEffect: {hitEffectNames[i]}");
+                    //Debug.WriteLine($"HitEffect: {hitEffectNames[i]}");
 #endif
                     HitEffects.Add(new HitEffect(br, hitEffectNames[i], offset + hitEffectPointers[i]));
                 }
