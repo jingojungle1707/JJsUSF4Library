@@ -9,10 +9,10 @@ namespace JJsUSF4Library.FileClasses
 {
     public class SFxTBCM : BCM
     {
-        public List<SFxTBCMInputMotion> InputMotions;
-        public List<SFxTBCMCharge> Charges;
-        public List<SFxTBCMMove> Moves;
-        public List<SFxTBCMCancel> Cancels;
+        public List<SFxTBCMInputMotion> InputMotions { get; set; } = new List<SFxTBCMInputMotion>();
+        public List<SFxTBCMCharge> Charges { get; set; } = new List<SFxTBCMCharge>();
+        public List<SFxTBCMMove> Moves { get; set; } = new List<SFxTBCMMove>();
+        public List<SFxTBCMCancel> Cancels { get; set; } = new List<SFxTBCMCancel>();
 
         public List<string> NameIndex;
 
@@ -260,61 +260,73 @@ namespace JJsUSF4Library.FileClasses
             USF4Utils.AddIntAsBytes(Data, UnkInt_0x44, true);
             USF4Utils.AddIntAsBytes(Data, UnkInt_0x48, true);
 
-            USF4Utils.UpdateIntAtPosition(Data, chargeIndexPointerPosition, Data.Count);
             List<int> chargeIndexPositions = new List<int>();
-            for (int i = 0; i < Charges.Count; i++)
-            {
-                chargeIndexPositions.Add(Data.Count);
-                USF4Utils.AddIntAsBytes(Data, i, true);
-            }
-            USF4Utils.UpdateIntAtPosition(Data, chargeNameIndexPointerPosition, Data.Count);
             List<int> chargeNameIndexPositions = new List<int>();
-            for (int i = 0; i < Charges.Count; i++)
+            if (Charges.Count > 0)
             {
-                chargeNameIndexPositions.Add(Data.Count);
-                USF4Utils.AddIntAsBytes(Data, i, true);
+                USF4Utils.UpdateIntAtPosition(Data, chargeIndexPointerPosition, Data.Count);
+                for (int i = 0; i < Charges.Count; i++)
+                {
+                    chargeIndexPositions.Add(Data.Count);
+                    USF4Utils.AddIntAsBytes(Data, i, true);
+                }
+                USF4Utils.UpdateIntAtPosition(Data, chargeNameIndexPointerPosition, Data.Count);
+                for (int i = 0; i < Charges.Count; i++)
+                {
+                    chargeNameIndexPositions.Add(Data.Count);
+                    USF4Utils.AddIntAsBytes(Data, i, true);
+                }
             }
-            USF4Utils.UpdateIntAtPosition(Data, inputMotionIndexPointerPosition, Data.Count);
             List<int> inputMotionIndexPositions = new List<int>();
-            for (int i = 0; i < InputMotions.Count; i++)
-            {
-                inputMotionIndexPositions.Add(Data.Count);
-                USF4Utils.AddIntAsBytes(Data, i, true);
-            }
-            USF4Utils.UpdateIntAtPosition(Data, inputMotionNameIndexPointerPosition, Data.Count);
             List<int> inputMotionNameIndexPostions = new List<int>();
-            for (int i = 0; i < InputMotions.Count; i++)
+            if (InputMotions.Count > 0)
             {
-                inputMotionNameIndexPostions.Add(Data.Count);
-                USF4Utils.AddIntAsBytes(Data, i, true);
+                USF4Utils.UpdateIntAtPosition(Data, inputMotionIndexPointerPosition, Data.Count);
+                for (int i = 0; i < InputMotions.Count; i++)
+                {
+                    inputMotionIndexPositions.Add(Data.Count);
+                    USF4Utils.AddIntAsBytes(Data, i, true);
+                }
+                USF4Utils.UpdateIntAtPosition(Data, inputMotionNameIndexPointerPosition, Data.Count);
+                for (int i = 0; i < InputMotions.Count; i++)
+                {
+                    inputMotionNameIndexPostions.Add(Data.Count);
+                    USF4Utils.AddIntAsBytes(Data, i, true);
+                } 
             }
-            USF4Utils.UpdateIntAtPosition(Data, moveIndexPointerPosition, Data.Count);
             List<int> moveIndexPositions = new List<int>();
-            for (int i = 0; i < Moves.Count; i++)
-            {
-                moveIndexPositions.Add(Data.Count);
-                USF4Utils.AddIntAsBytes(Data, i, true);
-            }
-            USF4Utils.UpdateIntAtPosition(Data, moveNameIndexPointerPosition, Data.Count);
             List<int> moveNameIndexPostions = new List<int>();
-            for (int i = 0; i < Moves.Count; i++)
+            if (Moves.Count > 0)
             {
-                moveNameIndexPostions.Add(Data.Count);
-                USF4Utils.AddIntAsBytes(Data, i, true);
+                USF4Utils.UpdateIntAtPosition(Data, moveIndexPointerPosition, Data.Count);
+                for (int i = 0; i < Moves.Count; i++)
+                {
+                    moveIndexPositions.Add(Data.Count);
+                    USF4Utils.AddIntAsBytes(Data, i, true);
+                }
+                USF4Utils.UpdateIntAtPosition(Data, moveNameIndexPointerPosition, Data.Count);
+                for (int i = 0; i < Moves.Count; i++)
+                {
+                    moveNameIndexPostions.Add(Data.Count);
+                    USF4Utils.AddIntAsBytes(Data, i, true);
+                } 
             }
-            USF4Utils.UpdateIntAtPosition(Data, cancelIndexPointerPosition, Data.Count);
             List<int> cancelIndexPositions = new List<int>();
-            for (int i = 0; i < Cancels.Count; i++)
-            {
-                cancelIndexPositions.Add(Data.Count);
-                USF4Utils.AddIntAsBytes(Data, 0, true);
-            }
-            USF4Utils.UpdateIntAtPosition(Data, cancelNameIndexPointerPosition, Data.Count);
             List<int> cancelNameIndexPositions = new List<int>();
-            for (int i = 0; i < Cancels.Count; i++)
+            if (Cancels.Count > 0)
             {
-                cancelNameIndexPositions.Add(Data.Count);
-                USF4Utils.AddIntAsBytes(Data, 0, true);
+                USF4Utils.UpdateIntAtPosition(Data, cancelIndexPointerPosition, Data.Count);
+                for (int i = 0; i < Cancels.Count; i++)
+                {
+                    cancelIndexPositions.Add(Data.Count);
+                    USF4Utils.AddIntAsBytes(Data, 0, true);
+                }
+                USF4Utils.UpdateIntAtPosition(Data, cancelNameIndexPointerPosition, Data.Count);
+                for (int i = 0; i < Cancels.Count; i++)
+                {
+                    cancelNameIndexPositions.Add(Data.Count);
+                    USF4Utils.AddIntAsBytes(Data, 0, true);
+                } 
             }
 
             //Indexes are set up, write Charges

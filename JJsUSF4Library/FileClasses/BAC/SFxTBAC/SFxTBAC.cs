@@ -10,12 +10,11 @@ namespace JJsUSF4Library.FileClasses
 {
     public class SFxTBAC : BAC
     {
-        public List<ScriptFile> ScriptFiles;
-        public List<HitEffect> HitEffects;
+        public List<ScriptFile> ScriptFiles { get; set; } = new List<ScriptFile>();
+        public List<HitEffect> HitEffects { get; set; } = new List<HitEffect>();
 
         public SFxTBAC()
         {
-
         }
 
         public SFxTBAC(BinaryReader br, string name, int offset = 0)
