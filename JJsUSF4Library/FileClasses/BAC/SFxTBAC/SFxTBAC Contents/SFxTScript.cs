@@ -51,7 +51,7 @@ namespace JJsUSF4Library.FileClasses.ScriptClasses
             EndsOn_ = br.ReadInt16();
             Loop = br.ReadInt32();
             int scriptSectionCount = br.ReadInt32();
-            int scriptSectionPointer = br.ReadInt32();
+            br.ReadInt32(); //script section pointer - always 0x20 so just skip it
             //0x20
             //Read script sections - each header is length 0x0C, so we use i * 0x0C for each section's start offset
             for (int i = 0; i < scriptSectionCount; i++) ScriptSections.Add(new ScriptSection(br, offset + 0x20 + i * 0x0C));
