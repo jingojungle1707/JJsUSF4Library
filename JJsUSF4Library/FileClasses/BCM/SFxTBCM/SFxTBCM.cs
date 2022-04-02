@@ -410,8 +410,8 @@ namespace JJsUSF4Library.FileClasses
                 Data.Add(Moves[i].AIVeryFar);
             }
             //Write cancels
-            List<int> CancellableMovePointerPositions = new List<int>();
-            List<int> CancelFlagsPointerPositions = new List<int>();
+            List<int> cancellableMovePointerPositions = new List<int>();
+            List<int> cancelFlagsPointerPositions = new List<int>();
             int CancelIndexPosition = Data.Count;
             for (int i = 0; i < Cancels.Count; i++)
             {
@@ -420,18 +420,18 @@ namespace JJsUSF4Library.FileClasses
                 {
                     USF4Utils.UpdateIntAtPosition(Data, cancelIndexPositions[i], 0);
                     //Add junk here to make sure the indices stay aligned
-                    CancellableMovePointerPositions.Add(0);
-                    CancelFlagsPointerPositions.Add(0);
+                    cancellableMovePointerPositions.Add(0);
+                    cancelFlagsPointerPositions.Add(0);
                 }
                 else
                 {
                     USF4Utils.UpdateIntAtPosition(Data, cancelIndexPositions[i], Data.Count);
                     USF4Utils.AddIntAsBytes(Data, 0, true);
-                    USF4Utils.AddIntAsBytes(Data, Cancels[i].CancellableMoveCount, true);
-                    CancellableMovePointerPositions.Add(Data.Count);
-                    USF4Utils.AddIntAsBytes(Data, Cancels[i].CancellableMoveIndexPointer, true);
-                    CancelFlagsPointerPositions.Add(Data.Count);
-                    USF4Utils.AddIntAsBytes(Data, Cancels[i].CancelFlagsPointer, true);
+                    USF4Utils.AddIntAsBytes(Data, Cancels[i].CancellableMoves.Count, true);
+                    cancellableMovePointerPositions.Add(Data.Count);
+                    USF4Utils.AddIntAsBytes(Data, 0, true);
+                    cancelFlagsPointerPositions.Add(Data.Count);
+                    USF4Utils.AddIntAsBytes(Data, 0, true);
                 }
             }
             for (int i = 0; i < Cancels.Count; i++)
@@ -440,11 +440,11 @@ namespace JJsUSF4Library.FileClasses
                 if (Cancels[i].CancellableMoves == null || Cancels[i].CancelFlags == null)
                     continue;
 
-                USF4Utils.UpdateIntAtPosition(Data, CancellableMovePointerPositions[i], Data.Count - CancelIndexPosition);
+                USF4Utils.UpdateIntAtPosition(Data, cancellableMovePointerPositions[i], Data.Count - CancelIndexPosition);
                 for (int j = 0; j < Cancels[i].CancellableMoves.Count; j++)
                     USF4Utils.AddIntAsBytes(Data, Cancels[i].CancellableMoves[j], false);
 
-                USF4Utils.UpdateIntAtPosition(Data, CancelFlagsPointerPositions[i], Data.Count - CancelIndexPosition);
+                USF4Utils.UpdateIntAtPosition(Data, cancelFlagsPointerPositions[i], Data.Count - CancelIndexPosition);
                 for (int j = 0; j < Cancels[i].CancelFlags.Count; j++)
                     Data.AddRange(Cancels[i].CancelFlags[j]);
 

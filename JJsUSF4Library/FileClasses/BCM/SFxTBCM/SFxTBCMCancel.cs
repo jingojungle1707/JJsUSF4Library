@@ -10,12 +10,6 @@ namespace JJsUSF4Library.FileClasses.ScriptClasses
         public List<int> CancellableMoves;
         public List<byte[]> CancelFlags;
 
-        //Header
-        public int
-            CancellableMoveCount,
-            CancellableMoveIndexPointer, //Counts from START OF THE INDIVIDUAL CANCEL ENTRY
-            CancelFlagsPointer;
-
         public SFxTBCMCancel()
         {
 
@@ -29,14 +23,14 @@ namespace JJsUSF4Library.FileClasses.ScriptClasses
 
             br.BaseStream.Seek(offset + 0x04, SeekOrigin.Begin);
 
-            CancellableMoveCount = br.ReadInt32();
-            CancellableMoveIndexPointer = br.ReadInt32();
-            CancelFlagsPointer = br.ReadInt32();
+            int cancellableMoveCount = br.ReadInt32();
+            int cancellableMoveIndexPointer = br.ReadInt32();
+            int cancelFlagsPointer = br.ReadInt32();
 
-            br.BaseStream.Seek(offset + CancellableMoveIndexPointer, SeekOrigin.Begin);
-            for (int i = 0; i < CancellableMoveCount; i++) CancellableMoves.Add(br.ReadInt16());
-            br.BaseStream.Seek(offset + CancelFlagsPointer, SeekOrigin.Begin);
-            for (int i = 0; i < CancellableMoveCount; i++) CancelFlags.Add(br.ReadBytes(8));
+            br.BaseStream.Seek(offset + cancellableMoveIndexPointer, SeekOrigin.Begin);
+            for (int i = 0; i < cancellableMoveCount; i++) CancellableMoves.Add(br.ReadInt16());
+            br.BaseStream.Seek(offset + cancelFlagsPointer, SeekOrigin.Begin);
+            for (int i = 0; i < cancellableMoveCount; i++) CancelFlags.Add(br.ReadBytes(8));
         }
         public SFxTBCMCancel(byte[] Data, string name)
         {
@@ -45,14 +39,14 @@ namespace JJsUSF4Library.FileClasses.ScriptClasses
             CancellableMoves = new List<int>();
             CancelFlags = new List<byte[]>();
 
-            CancellableMoveCount = USF4Utils.ReadInt(true, 0x04, Data);
-            CancellableMoveIndexPointer = USF4Utils.ReadInt(true, 0x08, Data);
-            CancelFlagsPointer = USF4Utils.ReadInt(true, 0x0C, Data);
+            int cancellableMoveCount = USF4Utils.ReadInt(true, 0x04, Data);
+            int cancellableMoveIndexPointer = USF4Utils.ReadInt(true, 0x08, Data);
+            int cancelFlagsPointer = USF4Utils.ReadInt(true, 0x0C, Data);
 
-            for (int i = 0; i < CancellableMoveCount; i++)
+            for (int i = 0; i < cancellableMoveCount; i++)
             {
-                CancellableMoves.Add(USF4Utils.ReadInt(false, CancellableMoveIndexPointer + i * 2, Data));
-                CancelFlags.Add(Data.Slice(CancelFlagsPointer + i * 8, 8));
+                CancellableMoves.Add(USF4Utils.ReadInt(false, cancellableMoveIndexPointer + i * 2, Data));
+                CancelFlags.Add(Data.Slice(cancelFlagsPointer + i * 8, 8));
             }
         }
     }
