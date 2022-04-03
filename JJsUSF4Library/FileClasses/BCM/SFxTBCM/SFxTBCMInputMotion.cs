@@ -58,7 +58,6 @@ namespace JJsUSF4Library.FileClasses.ScriptClasses
             public List<int>
                 Type,
                 Buffer, //Short
-                //Input, //Short
                 MoveFlags, //Short
                 Flags, //Long
                 Requirement; //Short

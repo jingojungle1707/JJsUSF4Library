@@ -5,9 +5,9 @@ namespace JJsUSF4Library.FileClasses.ScriptClasses
 {
     public class SFxTBCMCancel
     {
-        public string Name;
+        public string Name { get; set; }
 
-        public List<CancellableMove> CancellableMoves { get; set; } = new List<CancellableMove>();
+        public List<CancellableMove> CancelsInto { get; set; } = new List<CancellableMove>();
 
         public SFxTBCMCancel()
         {
@@ -36,7 +36,7 @@ namespace JJsUSF4Library.FileClasses.ScriptClasses
 
             for (int i = 0; i < cancellableMoveCount; i++)
             {
-                CancellableMoves.Add(new CancellableMove()
+                CancelsInto.Add(new CancellableMove()
                 {
                     CancellableMoveName = moveNames[moveIDs[i]],
                     UnkByte0_0x00 = cancelFlags[i][0],
@@ -54,7 +54,7 @@ namespace JJsUSF4Library.FileClasses.ScriptClasses
         {
             Name = name;
 
-            CancellableMoves = new List<CancellableMove>();
+            CancelsInto = new List<CancellableMove>();
 
             int cancellableMoveCount = USF4Utils.ReadInt(true, 0x04, Data);
             int cancellableMoveIndexPointer = USF4Utils.ReadInt(true, 0x08, Data);
@@ -69,7 +69,7 @@ namespace JJsUSF4Library.FileClasses.ScriptClasses
             }
             for (int i = 0; i < cancellableMoveCount; i++)
             {
-                CancellableMoves.Add(new CancellableMove()
+                CancelsInto.Add(new CancellableMove()
                 {
                     CancellableMoveName = moveNames[moveIDs[i]],
                     UnkByte0_0x00 = cancelFlags[i][0],
