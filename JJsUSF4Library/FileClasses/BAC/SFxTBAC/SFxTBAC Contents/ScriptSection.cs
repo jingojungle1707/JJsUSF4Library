@@ -470,8 +470,8 @@ namespace JJsUSF4Library.FileClasses.ScriptClasses
                         UNUSED0x0008 = 0x08,
 
                         COUNTERHIT = 0x10,
-                        UNUSED0x0020 = 0x20,
-                        UNUSED0x0040 = 0x40,
+                        UNK0x0020 = 0x20, //PacMan HIT_TURN_L
+                        UNK0x0040 = 0x40, //PacMan HIT_BODY_UPPER
                         UNK0x0080 = 0x80, //Always set when crouch?
 
                         UNK0x0100 = 0x0100,//Always set when airborne?

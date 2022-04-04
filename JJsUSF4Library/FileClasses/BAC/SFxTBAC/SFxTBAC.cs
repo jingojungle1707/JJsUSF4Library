@@ -99,175 +99,185 @@ namespace JJsUSF4Library.FileClasses
 
         public override byte[] GenerateBytes()
         {
-            List<byte> Data = new List<byte>();
+            List<byte> data = new List<byte>();
+
+            List<List<int>> scriptNamePointerPositions = new List<List<int>>();
+            List<int> hitEffectNamePointerPositions = new List<int>();
+            List<int> scriptFileNamePointerPositions = new List<int>();
 
             //Whenever we write dummy data for a name pointer, we add its position to the dictionary so we can update it later
-            Dictionary<string, int> ScriptFileNameDictionary = new Dictionary<string, int>();
-            Dictionary<string, int> ScriptNameDictionary = new Dictionary<string, int>();
-            Dictionary<string, int> HitEffectNameDictionary = new Dictionary<string, int>();
-            foreach (ScriptFile sf in ScriptFiles)
-            {
-                ScriptFileNameDictionary.Add(sf.Name, 0);
+            //Dictionary<string, int> scriptFileNameDictionary = new Dictionary<string, int>();
+            //Dictionary<string, int> scriptNameDictionary = new Dictionary<string, int>();
+            //Dictionary<string, int> hitEffectNameDictionary = new Dictionary<string, int>();
 
-                //Where there's multiple script files, there can be name collisions between stances
-                //So we prepend the script file name and use a "#" as a delimiter in case we later need to retrieve just the script name
-                foreach (SFxTScript s in sf.Scripts)
-                {
-                    if (s.ScriptSections == null) continue;
-                    ScriptNameDictionary.Add($"{sf.Name}#{s.Name}", 0);
-                }
-            }
-            foreach (HitEffect he in HitEffects)
-            {
-                if (he.HitEffectDatas == null) continue;
-                HitEffectNameDictionary.Add(he.Name, 0);
-            }
+            //foreach (ScriptFile sf in ScriptFiles)
+            //{
+            //    scriptFileNameDictionary.Add(sf.Name, 0);
 
-            Data.AddRange(new byte[] { 0x23, 0x42, 0x41, 0x43, 0xFE, 0xFF, 0x20, 0x00, 0x00, 0x00, 0x00, 0x00 });
-            USF4Utils.AddIntAsBytes(Data, ScriptFiles.Count, false);
-            USF4Utils.AddIntAsBytes(Data, HitEffects.Count, false);
+            //    //Where there's multiple script files, there can be name collisions between stances
+            //    //So we prepend the script file name and use a "#" as a delimiter in case we later need to retrieve just the script name
+            //    foreach (SFxTScript s in sf.Scripts)
+            //    {
+            //        if (s.ScriptSections == null) continue;
+            //        scriptNameDictionary.Add($"{sf.Name}#{s.Name}", 0);
+            //        //{ScriptFiles.IndexOf(sf)}#
+            //    }
+            //}
+            //foreach (HitEffect he in HitEffects)
+            //{
+            //    if (he.HitEffectDatas == null) continue;
+            //    hitEffectNameDictionary.Add(he.Name, 0);
+            //}
+
+            data.AddRange(new byte[] { 0x23, 0x42, 0x41, 0x43, 0xFE, 0xFF, 0x20, 0x00, 0x00, 0x00, 0x00, 0x00 });
+            USF4Utils.AddIntAsBytes(data, ScriptFiles.Count, false);
+            USF4Utils.AddIntAsBytes(data, HitEffects.Count, false);
             //0x10
-            int ScriptFileIndexPointerPosition = Data.Count;
-            USF4Utils.AddIntAsBytes(Data, -1, true);
-            int ScriptFileNameIndexPointerPosition = Data.Count;
-            USF4Utils.AddIntAsBytes(Data, -1, true);
-            int HitEffectIndexPointerPosition = Data.Count;
-            USF4Utils.AddIntAsBytes(Data, -1, true);
-            int HitEffectNameIndexPointerPosition = Data.Count;
-            USF4Utils.AddIntAsBytes(Data, -1, true);
+            int scriptFileIndexPointerPosition = data.Count;
+            USF4Utils.AddIntAsBytes(data, 0, true);
+            int scriptFileNameIndexPointerPosition = data.Count;
+            USF4Utils.AddIntAsBytes(data, 0, true);
+            int hitEffectIndexPointerPosition = data.Count;
+            USF4Utils.AddIntAsBytes(data, 0, true);
+            int hitEffectNameIndexPointerPosition = data.Count;
+            USF4Utils.AddIntAsBytes(data, 0, true);
             //0x20
             //Write out main indexes
-            USF4Utils.UpdateIntAtPosition(Data, ScriptFileIndexPointerPosition, Data.Count);
-            List<int> ScriptFilePointerPositions = new List<int>();
+            USF4Utils.UpdateIntAtPosition(data, scriptFileIndexPointerPosition, data.Count);
+            List<int> scriptFilePointerPositions = new List<int>();
             for (int i = 0; i < ScriptFiles.Count; i++)
             {
-                ScriptFilePointerPositions.Add(Data.Count);
-                USF4Utils.AddIntAsBytes(Data, -1, true);
+                scriptFilePointerPositions.Add(data.Count);
+                USF4Utils.AddIntAsBytes(data, -1, true);
             }
-            USF4Utils.UpdateIntAtPosition(Data, ScriptFileNameIndexPointerPosition, Data.Count);
-            List<int> ScriptFileNamePointerPositions = new List<int>();
+            USF4Utils.UpdateIntAtPosition(data, scriptFileNameIndexPointerPosition, data.Count);
             for (int i = 0; i < ScriptFiles.Count; i++)
             {
-                ScriptFileNameDictionary[ScriptFiles[i].Name] = Data.Count;
-                ScriptFileNamePointerPositions.Add(Data.Count);
-                USF4Utils.AddIntAsBytes(Data, -1, true);
+                //scriptFileNameDictionary[ScriptFiles[i].Name] = data.Count;
+                scriptFileNamePointerPositions.Add(data.Count);
+                USF4Utils.AddIntAsBytes(data, -1, true);
             }
-            USF4Utils.UpdateIntAtPosition(Data, HitEffectIndexPointerPosition, Data.Count);
-            List<int> HitEffectPointerPositions = new List<int>();
+            USF4Utils.UpdateIntAtPosition(data, hitEffectIndexPointerPosition, data.Count);
+            List<int> hitEffectPointerPositions = new List<int>();
             for (int i = 0; i < HitEffects.Count; i++)
             {
-                HitEffectPointerPositions.Add(Data.Count);
-                USF4Utils.AddIntAsBytes(Data, -1, true);
+                hitEffectPointerPositions.Add(data.Count);
+                USF4Utils.AddIntAsBytes(data, -1, true);
             }
-            USF4Utils.UpdateIntAtPosition(Data, HitEffectNameIndexPointerPosition, Data.Count);
-            List<int> HitEffectNamePointerPositions = new List<int>();
+            USF4Utils.UpdateIntAtPosition(data, hitEffectNameIndexPointerPosition, data.Count);
+            //List<int> hitEffectNamePointerPositions = new List<int>();
             for (int i = 0; i < HitEffects.Count; i++)
             {
                 if (HitEffects[i].HitEffectDatas != null)
                 {
-                    HitEffectNameDictionary[HitEffects[i].Name] = Data.Count;
+                    //hitEffectNameDictionary[HitEffects[i].Name] = data.Count;
+                    hitEffectNamePointerPositions.Add(data.Count);
                 }
-                HitEffectNamePointerPositions.Add(Data.Count);
-                USF4Utils.AddIntAsBytes(Data, 0, true);
+                else
+                {
+                    hitEffectNamePointerPositions.Add(-1);
+                }
+                USF4Utils.AddIntAsBytes(data, 0, true);
             }
             //Start writing ScriptFiles
             List<int> scriptFileStartOSList = new List<int>();
             for (int i = 0; i < ScriptFiles.Count; i++)
             {
-                scriptFileStartOSList.Add(Data.Count);
+                scriptNamePointerPositions.Add(new List<int>());
+                scriptFileStartOSList.Add(data.Count);
 
-                USF4Utils.UpdateIntAtPosition(Data, ScriptFilePointerPositions[i], Data.Count);
+                USF4Utils.UpdateIntAtPosition(data, scriptFilePointerPositions[i], data.Count);
 
                 ScriptFile sf = ScriptFiles[i];
 
-                USF4Utils.AddIntAsBytes(Data, sf.UnkShort0_0x00, false);
-                USF4Utils.AddIntAsBytes(Data, sf.Scripts.Count, false);
-                USF4Utils.AddIntAsBytes(Data, 0x0C, true); //Script Index Pointer should always be 0x0C, so don't bother doing an "update"
-                int ScriptNameIndexPointerPosition = Data.Count;
-                USF4Utils.AddIntAsBytes(Data, 0, true);
-                List<int> ScriptPointerPositions = new List<int>();
+                USF4Utils.AddIntAsBytes(data, sf.UnkShort0_0x00, false);
+                USF4Utils.AddIntAsBytes(data, sf.Scripts.Count, false);
+                USF4Utils.AddIntAsBytes(data, 0x0C, true); //Script Index Pointer should always be 0x0C, so don't bother doing an "update"
+                int scriptNameIndexPointerPosition = data.Count;
+                USF4Utils.AddIntAsBytes(data, 0, true);
+                List<int> scriptPointerPositions = new List<int>();
                 for (int j = 0; j < sf.Scripts.Count; j++)
                 {
-                    ScriptPointerPositions.Add(Data.Count);
-                    USF4Utils.AddIntAsBytes(Data, -1, true);
+                    scriptPointerPositions.Add(data.Count);
+                    USF4Utils.AddIntAsBytes(data, -1, true);
                 }
-                USF4Utils.UpdateIntAtPosition(Data, ScriptNameIndexPointerPosition, Data.Count - scriptFileStartOSList[i]);
-                List<int> ScriptNamePointerPositions = new List<int>();
+                USF4Utils.UpdateIntAtPosition(data, scriptNameIndexPointerPosition, data.Count - scriptFileStartOSList[i]);
                 for (int j = 0; j < sf.Scripts.Count; j++)
                 {
                     if (sf.Scripts[j].ScriptSections != null)
                     {
-                        ScriptNameDictionary[$"{sf.Name}#{sf.Scripts[j].Name}"] = Data.Count;
+                        //scriptNameDictionary[$"{sf.Name}#{sf.Scripts[j].Name}"] = data.Count;
+                        scriptNamePointerPositions[i].Add(data.Count);
                     }
-                    ScriptNamePointerPositions.Add(Data.Count);
-                    USF4Utils.AddIntAsBytes(Data, 0, true);
+                    else scriptNamePointerPositions[i].Add(-1);
+                    USF4Utils.AddIntAsBytes(data, 0, true);
                 }
                 for (int j = 0; j < sf.Scripts.Count; j++)
                 {
                     if (sf.Scripts[j].ScriptSections == null)
                     {
-                        USF4Utils.UpdateIntAtPosition(Data, ScriptPointerPositions[j], 0x00);
+                        USF4Utils.UpdateIntAtPosition(data, scriptPointerPositions[j], 0x00);
                         continue;
                     }
-                    USF4Utils.UpdateIntAtPosition(Data, ScriptPointerPositions[j], Data.Count - scriptFileStartOSList[i]);
+                    USF4Utils.UpdateIntAtPosition(data, scriptPointerPositions[j], data.Count - scriptFileStartOSList[i]);
 
                     SFxTScript s = sf.Scripts[j];
 
-                    USF4Utils.AddIntAsBytes(Data, s.HitboxStart, false);
-                    USF4Utils.AddIntAsBytes(Data, s.HitboxEnd, false);
-                    USF4Utils.AddIntAsBytes(Data, s.IASA, false);
-                    USF4Utils.AddIntAsBytes(Data, s.End, false);
-                    USF4Utils.AddIntAsBytes(Data, s.UnkLong4_0x08, true);
-                    USF4Utils.AddFloatAsBytes(Data, s.XOffset);
-                    USF4Utils.AddIntAsBytes(Data, s.ScriptFlags, false);
-                    USF4Utils.AddIntAsBytes(Data, s.EndsOn_, false);
-                    USF4Utils.AddIntAsBytes(Data, s.Loop, true);
-                    USF4Utils.AddIntAsBytes(Data, s.ScriptSections.Count, true);
-                    USF4Utils.AddIntAsBytes(Data, 0x20, true); //ScriptSectionPointer; should always be 0x20 so don't bother with "update"
+                    USF4Utils.AddIntAsBytes(data, s.HitboxStart, false);
+                    USF4Utils.AddIntAsBytes(data, s.HitboxEnd, false);
+                    USF4Utils.AddIntAsBytes(data, s.IASA, false);
+                    USF4Utils.AddIntAsBytes(data, s.End, false);
+                    USF4Utils.AddIntAsBytes(data, s.UnkLong4_0x08, true);
+                    USF4Utils.AddFloatAsBytes(data, s.XOffset);
+                    USF4Utils.AddIntAsBytes(data, s.ScriptFlags, false);
+                    USF4Utils.AddIntAsBytes(data, s.EndsOn_, false);
+                    USF4Utils.AddIntAsBytes(data, s.Loop, true);
+                    USF4Utils.AddIntAsBytes(data, s.ScriptSections.Count, true);
+                    USF4Utils.AddIntAsBytes(data, 0x20, true); //ScriptSectionPointer; should always be 0x20 so don't bother with "update"
 
-                    Data.AddRange(s.GenerateScriptBytes().ToList());
+                    data.AddRange(s.GenerateScriptBytes().ToList());
                 }
             }
             //FINISHED WRITING SCRIPTS, START HIT EFFECTS
             for (int i = 0; i < HitEffects.Count; i++)
             {
-                if (HitEffects[i].HitEffectDatas == null)
+                if (HitEffects[i].HitEffectDatas == null || HitEffects[i].Name == null)
                 {
-                    USF4Utils.UpdateIntAtPosition(Data, HitEffectPointerPositions[i], 0);
+                    USF4Utils.UpdateIntAtPosition(data, hitEffectPointerPositions[i], 0);
                 }
                 else
                 {
-                    USF4Utils.UpdateIntAtPosition(Data, HitEffectPointerPositions[i], Data.Count);
-                    Data.AddRange(HitEffects[i].GenerateHitEffectBytes());
+                    USF4Utils.UpdateIntAtPosition(data, hitEffectPointerPositions[i], data.Count);
+                    data.AddRange(HitEffects[i].GenerateHitEffectBytes());
                 }
             }
             //FINISHED WRITING HIT EFFECTS, NAME INDEX GOOOO
             for (int i = 0; i < ScriptFiles.Count; i++)
             {
-                USF4Utils.UpdateIntAtPosition(Data, ScriptFileNameDictionary[ScriptFiles[i].Name], Data.Count);
-                Data.AddRange(Encoding.ASCII.GetBytes(ScriptFiles[i].Name));
-                Data.Add(0x00);
+                USF4Utils.UpdateIntAtPosition(data, scriptFileNamePointerPositions[i], data.Count);
+                data.AddRange(Encoding.ASCII.GetBytes(ScriptFiles[i].Name));
+                data.Add(0x00);
 
                 for (int j = 0; j < ScriptFiles[i].Scripts.Count; j++)
                 {
-                    if (ScriptFiles[i].Scripts[j].ScriptSections != null)
+                    if (ScriptFiles[i].Scripts[j].ScriptSections != null && ScriptFiles[i].Scripts[j].Name != null && scriptNamePointerPositions[i][j] > 0)
                     {
-                        USF4Utils.UpdateIntAtPosition(Data, ScriptNameDictionary[$"{ScriptFiles[i].Name}#{ScriptFiles[i].Scripts[j].Name}"], Data.Count - scriptFileStartOSList[i]);
-                        Data.AddRange(Encoding.ASCII.GetBytes(ScriptFiles[i].Scripts[j].Name));
-                        Data.Add(0x00);
+                        USF4Utils.UpdateIntAtPosition(data, scriptNamePointerPositions[i][j], data.Count - scriptFileStartOSList[i]);
+                        data.AddRange(Encoding.ASCII.GetBytes(ScriptFiles[i].Scripts[j].Name));
+                        data.Add(0x00);
                     }
                 }
             }
             for (int i = 0; i < HitEffects.Count; i++)
             {
-                if (HitEffects[i].HitEffectDatas != null)
+                if (HitEffects[i].HitEffectDatas != null && HitEffects[i].Name != null)
                 {
-                    USF4Utils.UpdateIntAtPosition(Data, HitEffectNameDictionary[HitEffects[i].Name], Data.Count);
-                    Data.AddRange(Encoding.ASCII.GetBytes(HitEffects[i].Name));
-                    Data.Add(0x00);
+                    USF4Utils.UpdateIntAtPosition(data, hitEffectNamePointerPositions[i], data.Count);
+                    data.AddRange(Encoding.ASCII.GetBytes(HitEffects[i].Name));
+                    data.Add(0x00);
                 }
             }
-            return Data.ToArray();
+            return data.ToArray();
         }
     }
 }
