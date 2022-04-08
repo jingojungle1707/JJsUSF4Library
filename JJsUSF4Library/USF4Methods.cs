@@ -10,7 +10,7 @@ namespace JJsUSF4Library
         /// Bitflag declaring what vertex data is contained in this model's vertex block
         /// </summary>
         [Flags]
-        public enum ModeFlag
+        public enum ModelFlag
         {
             /// <summary>
             /// Length 0x0C
@@ -54,6 +54,7 @@ namespace JJsUSF4Library
             RY2 = 0x59523223,
             BAC = 0x43414223,
             BCM = 0x4D434223,
+            BVS = 0x53564223,
         }
 
         public enum BACFileVersion
