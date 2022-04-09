@@ -10,7 +10,7 @@ namespace JJsUSF4Library.FileClasses
     /// </summary>
     public class EMB : USF4File
     {
-        public List<USF4File> Files { get; set; }
+        public List<USF4File> Files { get; set; } = new List<USF4File>();
         public List<string> FileNames { get { return Files.Select(o => o.Name).ToList(); } }
 
         public override byte[] GenerateBytes()
@@ -23,17 +23,17 @@ namespace JJsUSF4Library.FileClasses
             USF4Utils.AddIntAsBytes(data, Files.Count, true);
             USF4Utils.AddPaddingZeros(data, 0x18, data.Count);
             int fileListPointerPosition = data.Count;
-            USF4Utils.AddIntAsBytes(data, -1, true);
+            USF4Utils.AddIntAsBytes(data, 0, true);
             int fileNameListPointerPosition = data.Count;
-            USF4Utils.AddIntAsBytes(data, -1, true);
+            USF4Utils.AddIntAsBytes(data, 0, true);
 
             USF4Utils.UpdateIntAtPosition(data, fileListPointerPosition, data.Count);
             for (int i = 0; i < Files.Count; i++)
             {
                 filePointerPositions.Add(data.Count);
-                USF4Utils.AddIntAsBytes(data, -1, true);
+                USF4Utils.AddIntAsBytes(data, 0, true);
                 fileLengthPositions.Add(data.Count);
-                USF4Utils.AddIntAsBytes(data, -1, true);
+                USF4Utils.AddIntAsBytes(data, 0, true);
             }
 
             USF4Utils.UpdateIntAtPosition(data, fileNameListPointerPosition, data.Count);
@@ -41,7 +41,7 @@ namespace JJsUSF4Library.FileClasses
             for (int i = 0; i < Files.Count; i++)
             {
                 fileNamePointerPositions.Add(data.Count);
-                USF4Utils.AddIntAsBytes(data, -1, true);
+                USF4Utils.AddIntAsBytes(data, 0, true);
             }
 
             USF4Utils.AddZeroToLineEnd(data);
@@ -49,9 +49,12 @@ namespace JJsUSF4Library.FileClasses
             for (int i = 0; i < Files.Count; i++)
             {
                 byte[] bytes = Files[i].GenerateBytes();
-                USF4Utils.UpdateIntAtPosition(data, filePointerPositions[i], data.Count - (0x20 + i * 8));
-                USF4Utils.UpdateIntAtPosition(data, fileLengthPositions[i], bytes.Length);
-                data.AddRange(bytes);
+                if (bytes.Length > 0)
+                {
+                    USF4Utils.UpdateIntAtPosition(data, filePointerPositions[i], data.Count - (0x20 + i * 8));
+                    USF4Utils.UpdateIntAtPosition(data, fileLengthPositions[i], bytes.Length);
+                    data.AddRange(bytes);
+                }
 
                 USF4Utils.AddZeroToLineEnd(data);
             }

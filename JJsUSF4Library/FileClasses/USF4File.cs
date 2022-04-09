@@ -10,7 +10,7 @@ namespace JJsUSF4Library.FileClasses
 {
     public class USF4File : INameableUSF4Object
     {
-        private byte[] _binaryData;
+        private byte[] _binaryData = new byte[0];
 
         public virtual byte[] GenerateBytes()
         {
