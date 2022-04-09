@@ -102,6 +102,7 @@ namespace JJsUSF4Library
                 FileType.RY2 => new RY2(),
                 FileType.BAC => new BAC(),
                 FileType.BCM => new BCM(),
+                FileType.BVS => new BVS(),
                 _ => new OtherFile(),
             };
         }

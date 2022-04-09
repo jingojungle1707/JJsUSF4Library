@@ -334,10 +334,10 @@ namespace JJsUSF4Library
             return byteReturn;
         }
 
-        public static string ReadZString(this BinaryReader reader, int maxLength = 20)
+        public static string ReadZString(this BinaryReader reader)
         {
             var result = new StringBuilder();
-            for (int i = 0; i < maxLength; i++)
+            while (true)
             {
                 byte b = reader.ReadByte();
                 if (0 == b)

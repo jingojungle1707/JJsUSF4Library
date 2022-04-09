@@ -29,5 +29,17 @@ namespace JJsUSF4Library.FileClasses.SubfileClasses
             br.BaseStream.Seek(offset + resourcePointer, SeekOrigin.Begin);
             ResourceName = br.ReadZString();
         }
+        public List<byte> GenerateBytes()
+        {
+            List<byte> data = new List<byte>();
+
+            USF4Utils.AddIntAsBytes(data, 0, true); //resource pointer to be updated later
+            USF4Utils.AddIntAsBytes(data, UnkShort0x04, false);
+            USF4Utils.AddIntAsBytes(data, BitFlag, false);
+            USF4Utils.AddFloatAsBytes(data, UnkFloat0x08);
+            USF4Utils.AddFloatAsBytes(data, UnkFloat0x0C);
+
+            return data;
+        }
     }
 }
