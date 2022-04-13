@@ -14,7 +14,10 @@ namespace JJsUSF4Library.FileClasses.SubfileClasses
         public int BitFlag { get; set; }
         public float UnkFloat0x08 { get; set; } //Always 1.0?
         public float UnkFloat0x0C { get; set; } //Always 0/unused?
+        public ResourceItem()
+        {
 
+        }
         public ResourceItem(BinaryReader br, int offset = 0)
         {
             br.BaseStream.Seek(offset, SeekOrigin.Begin);

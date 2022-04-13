@@ -17,6 +17,11 @@ namespace JJsUSF4Library.FileClasses.SubfileClasses
         public int UnkShort0x2A { get; set; } //probably unused
         //0x2C long resource pointer
 
+        public GFX()
+        {
+
+        }
+
         public GFX(BinaryReader br, int offset = 0)
         {
             br.BaseStream.Seek(offset, SeekOrigin.Begin);

@@ -17,7 +17,10 @@ namespace JJsUSF4Library.FileClasses.SubfileClasses
         public float UnkFloat0x14 { get; set; }
         public float UnkFloat0x18 { get; set; }
         public float UnkFloat0x1C { get; set; }
+        public ResourceInstanceParamType1()
+        {
 
+        }
         public ResourceInstanceParamType1(BinaryReader br, int offset = 0)
         {
             br.BaseStream.Seek(offset, SeekOrigin.Begin);

@@ -19,7 +19,10 @@ namespace JJsUSF4Library.FileClasses.SubfileClasses
         public int UnkLong0x14 { get; set; } //Unused
         public int UnkLong0x18 { get; set; } //Unused
         public int UnkLong0x1C { get; set; } //Unused
+        public ResourceInstanceParamType2()
+        {
 
+        }
         public ResourceInstanceParamType2(BinaryReader br, int offset = 0)
         {
             br.BaseStream.Seek(offset, SeekOrigin.Begin);

@@ -28,7 +28,10 @@ namespace JJsUSF4Library.FileClasses.SubfileClasses
         public int UnkLong0x18 { get; set; }
         public int UnkLong0x1C { get; set; }
         public int UnkLong0x20 { get; set; }
+        public ResourceInstance()
+        {
 
+        }
         public ResourceInstance(BinaryReader br, int offset = 0)
         {
             br.BaseStream.Seek(offset, SeekOrigin.Begin);

@@ -133,13 +133,19 @@ namespace JJsUSF4Library.FileClasses
             {
                 //File starts at pointer positions + pointer
                 br.BaseStream.Seek(fileListPointer + i * 8 + filePointersList[i] + offset, SeekOrigin.Begin);
-                USF4File file = USF4Methods.FetchClass((USF4Methods.FileType)br.ReadInt32());
-                //USF4File file = USF4Methods.CheckFile(br.ReadBytes(4));
+                USF4File file = GetFileType(br.ReadInt32());
+
+
+
                 file.ReadFromStream(br, fileListPointer + i * 8 + filePointersList[i] + offset, fileLengthsList[i]);
                 file.Name = fileNames[i];
                 Files.Add(file);
             }
             #endregion
+        }
+        protected virtual USF4File GetFileType(int dword)
+        {
+            return USF4Methods.FetchClass((USF4Methods.FileType)dword);
         }
 
     }

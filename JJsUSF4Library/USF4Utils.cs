@@ -22,7 +22,7 @@ namespace JJsUSF4Library
             }
         }
 
-        public static USF4File OpenFileStreamCheckCompression(string filepath)
+        public static USF4File OpenFileStreamCheckCompression(string filepath, bool blind = false)
         {
             byte[] bytes = Array.Empty<byte>();
             USF4Methods.FileType type;
@@ -48,6 +48,13 @@ namespace JJsUSF4Library
 
             if (type is USF4Methods.FileType.BAC) uf = USF4Methods.FetchVersion(version);
             if (type is USF4Methods.FileType.BCM) uf = USF4Methods.FetchVersion((USF4Methods.BCMFileVersion)version);
+
+            if (blind == true)
+            {
+                if (uf.GetType() == typeof(EMB)) uf = new BlindEMB();
+                else uf = new OtherFile();
+            }
+
             uf.Name = Path.GetFileName(filepath);
 
             //We decompressed bytes, so we need to work from a MemoryStream instead of FileStream

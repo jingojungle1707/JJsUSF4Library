@@ -18,7 +18,10 @@ namespace JJsUSF4Library.FileClasses.SubfileClasses
 
         //0x2A short resource count
         //0x2C long resource pointer
+        public GFX2()
+        {
 
+        }
         public GFX2(BinaryReader br, int offset = 0)
         {
             br.BaseStream.Seek(offset, SeekOrigin.Begin);
