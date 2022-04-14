@@ -5,23 +5,23 @@ using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 
-namespace JJsUSF4Library.FileClasses.SubfileClasses
+namespace JJsUSF4Library.FileClasses.EMEClasses.Emitters
 {
-    public class AnimatedSpriteFrame : ISpriteFrame
+    public class ParticleVariant
     {
-        public float Frame { get; set; }
+        public float SpawnCount { get; set; }
         public float XOffset { get; set; }
         public float YOffset { get; set; }
         public float Width { get; set; }
         public float Height { get; set; }
 
-        public AnimatedSpriteFrame()
+        public ParticleVariant()
         {
 
         }
-        public AnimatedSpriteFrame(BinaryReader br)
+        public ParticleVariant(BinaryReader br)
         {
-            Frame = br.ReadSingle();
+            SpawnCount = br.ReadSingle();
             XOffset = br.ReadSingle();
             YOffset = br.ReadSingle();
             Width = br.ReadSingle();

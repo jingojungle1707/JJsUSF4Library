@@ -45,6 +45,7 @@ namespace JJsUSF4Library
             CSB = 0x46545540,
             EMA = 0x414D4523,
             EMB = 0x424D4523,
+            EME = 0x454D4523,
             EMG = 0x474D4523,
             EMM = 0x4D4D4523,
             EMO = 0x4F4D4523,
@@ -55,6 +56,7 @@ namespace JJsUSF4Library
             BAC = 0x43414223,
             BCM = 0x4D434223,
             BVS = 0x53564223,
+            BTR = 0x52544223,
         }
 
         public enum BACFileVersion
@@ -93,6 +95,7 @@ namespace JJsUSF4Library
                 FileType.EMZ => new EMZ(),
                 FileType.EMA => new EMA(),
                 FileType.EMB => new EMB(),
+                FileType.EME => new FileClasses.EMEClasses.EME(),
                 FileType.EMG => new EMG(),
                 FileType.EMM => new EMM(),
                 FileType.EMO => new EMO(),
@@ -103,6 +106,7 @@ namespace JJsUSF4Library
                 FileType.BAC => new BAC(),
                 FileType.BCM => new BCM(),
                 FileType.BVS => new BVS(),
+                FileType.BTR => new BTR(),
                 _ => new OtherFile(),
             };
         }

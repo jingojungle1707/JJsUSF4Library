@@ -30,7 +30,27 @@ namespace JJsUSF4Library.FileClasses
 
         public override void ReadFromStream(BinaryReader br, int offset = 0, int fileLength = 0)
         {
-            
+            br.BaseStream.Seek(offset + 0x0C, SeekOrigin.Begin);
+
+            int tracerCount = br.ReadInt32();
+            //0x10
+            int tracerPointer = br.ReadInt32();
+            int spriteSheetCount = br.ReadInt32();
+            int spriteSheetPointer = br.ReadInt32();
+
+            if (spriteSheetCount > 2)
+            {
+                //throw new Exception($"MULTIPLE SPRITE SHEETS IN .btr FILE \"{Name}\"");
+            }
+
+            for (int i = 0; i < tracerCount; i++)
+            {
+                Tracers.Add(new Tracer(br, offset + tracerPointer + i * 0xC0));
+            }
+            for (int i = 0; i < spriteSheetCount; i++)
+            {
+                SpriteSheets.Add(new SpriteSheet(br, offset + spriteSheetPointer + i * 0x1C));
+            }
         }
     }
 }

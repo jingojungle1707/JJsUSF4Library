@@ -11,6 +11,7 @@ namespace JJsUSF4Library.FileClasses.SubfileClasses
     {
         public int UnkLong0x00 { get; set; }
         public int BoneReference { get; set; }
+        public int BoneReference2 { get; set; }
         public int UnkLong0x08 { get; set; }
         public int UnkLong0x0C { get; set; }
         //Floats x 0x24, total length 0x90
@@ -34,7 +35,8 @@ namespace JJsUSF4Library.FileClasses.SubfileClasses
             br.BaseStream.Seek(offset, SeekOrigin.Begin);
 
             UnkLong0x00 = br.ReadInt32();
-            BoneReference = br.ReadInt32();
+            BoneReference = br.ReadInt16();
+            BoneReference2 = br.ReadInt16();
             UnkLong0x08 = br.ReadInt32();
             UnkLong0x0C = br.ReadInt32();
 
