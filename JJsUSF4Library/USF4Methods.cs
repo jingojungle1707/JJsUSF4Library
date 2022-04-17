@@ -95,7 +95,7 @@ namespace JJsUSF4Library
                 FileType.EMZ => new EMZ(),
                 FileType.EMA => new EMA(),
                 FileType.EMB => new EMB(),
-                FileType.EME => new FileClasses.EMEClasses.EME(),
+                FileType.EME => new FileClasses.EMEClasses.BasicEME(),
                 FileType.EMG => new EMG(),
                 FileType.EMM => new EMM(),
                 FileType.EMO => new EMO(),

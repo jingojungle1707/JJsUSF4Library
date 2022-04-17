@@ -52,5 +52,13 @@ namespace JJsUSF4Library.FileClasses
                 SpriteSheets.Add(new SpriteSheet(br, offset + spriteSheetPointer + i * 0x1C));
             }
         }
+
+        public void UpdateTextureIndices(int valueToAdd)
+        {
+            foreach (SpriteSheet item in SpriteSheets)
+            {
+                item.TextureIndex += (byte)valueToAdd;
+            }
+        }
     }
 }
