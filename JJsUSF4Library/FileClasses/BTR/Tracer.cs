@@ -9,6 +9,7 @@ namespace JJsUSF4Library.FileClasses.SubfileClasses
 {
     public class Tracer
     {
+        public SpriteSheet Sprites { get; set; }
         public int UnkLong0x00 { get; set; }
         public int BoneReference { get; set; }
         public int BoneReference2 { get; set; }
@@ -30,7 +31,7 @@ namespace JJsUSF4Library.FileClasses.SubfileClasses
         {
 
         }
-        public Tracer(BinaryReader br, int offset = 0)
+        public Tracer(BinaryReader br, out int spriteSheetPointer, int offset = 0)
         {
             br.BaseStream.Seek(offset, SeekOrigin.Begin);
 
@@ -45,7 +46,7 @@ namespace JJsUSF4Library.FileClasses.SubfileClasses
             UnkShort0xA0 = br.ReadInt16();
             UnkShort0xA2 = br.ReadInt16();
 
-            int spriteSheetPointer = br.ReadInt32();
+            spriteSheetPointer = br.ReadInt32();
 
             UnkFloat0xA8 = br.ReadSingle();
             UnkFloat0xAC = br.ReadSingle();
@@ -54,7 +55,31 @@ namespace JJsUSF4Library.FileClasses.SubfileClasses
             UnkFloat0xB8 = br.ReadSingle();
             UnkFloat0xBC = br.ReadSingle();
         }
+        public List<byte> GenerateBytes(out int spriteSheetPointerPosition)
+        {
+            List<byte> data = new List<byte>();
+            USF4Utils.AddIntAsBytes(data, UnkLong0x00, true);
+            USF4Utils.AddIntAsBytes(data, BoneReference, false);
+            USF4Utils.AddIntAsBytes(data, BoneReference2, false);
+            USF4Utils.AddIntAsBytes(data, UnkLong0x08, true);
+            USF4Utils.AddIntAsBytes(data, UnkLong0x0C, true);
 
+            foreach (float f in FloatIndex0x24) USF4Utils.AddFloatAsBytes(data, f);
 
+            USF4Utils.AddIntAsBytes(data, UnkShort0xA0, false);
+            USF4Utils.AddIntAsBytes(data, UnkShort0xA2, false);
+
+            spriteSheetPointerPosition = data.Count;
+            USF4Utils.AddIntAsBytes(data, 0, true);
+
+            USF4Utils.AddFloatAsBytes(data, UnkFloat0xA8);
+            USF4Utils.AddFloatAsBytes(data, UnkFloat0xAC);
+            USF4Utils.AddFloatAsBytes(data, UnkFloat0xB0);
+            USF4Utils.AddFloatAsBytes(data, UnkFloat0xB4);
+            USF4Utils.AddFloatAsBytes(data, UnkFloat0xB8);
+            USF4Utils.AddFloatAsBytes(data, UnkFloat0xBC);
+
+            return data;
+        }
     }
 }
