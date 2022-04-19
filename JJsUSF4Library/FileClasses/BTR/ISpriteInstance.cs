@@ -9,5 +9,7 @@ namespace JJsUSF4Library.FileClasses.BTRClasses
     public interface ISpriteInstance
     {
         List<ISpriteFrame> Frames { get; set; }
+
+        public List<byte> GenerateHeaderBytes();
     }
 }

@@ -37,5 +37,18 @@ namespace JJsUSF4Library.FileClasses.BTRClasses
                 Frames.Add(new AnimatedSpriteFrame(br));
             }
         }
+
+        public List<byte> GenerateHeaderBytes()
+        {
+            List<byte> data = new List<byte>();
+
+            USF4Utils.AddFloatAsBytes(data, Duration);
+            USF4Utils.AddIntAsBytes(data, UnkLong0x04, true);
+            USF4Utils.AddIntAsBytes(data, UnkShort0x08, false);
+            USF4Utils.AddIntAsBytes(data, Frames.Count, false);
+            USF4Utils.AddIntAsBytes(data, 0, true); //frames pointer
+
+            return data;
+        }
     }
 }

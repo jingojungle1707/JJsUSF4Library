@@ -93,6 +93,7 @@ namespace JJsUSF4Library.FileClasses.BTRClasses
                 tracerSpritePointerPositions.Add(tracerStartOffset + tracerSpritePointerPosition);
             }
 
+            List<int> frameDataPointerPositions = new List<int>();
             USF4Utils.UpdateIntAtPosition(data, spriteSheetPointerPosition, data.Count);
             foreach (SpriteSheet spriteSheet in SpriteSheets)
             {
@@ -105,8 +106,21 @@ namespace JJsUSF4Library.FileClasses.BTRClasses
                     }
                 }
 
-                //data.AddRange(spriteSheet.GenerateHeaderBytes());
+                int headerStartOffset = data.Count;
+                data.AddRange(spriteSheet.GenerateHeaderBytes(out int frameDataPointerPosition));
+                if (frameDataPointerPosition != -1) frameDataPointerPositions.Add(frameDataPointerPosition + headerStartOffset);
             }
+            for (int i = 0; i < SpriteSheets.Count; i++)
+            {
+                if (frameDataPointerPositions[i] == -1) continue;
+
+                SpriteSheet spriteSheet = SpriteSheets[i];
+
+                USF4Utils.UpdateIntAtPosition(data, frameDataPointerPositions[i], data.Count - (frameDataPointerPositions[i] - 0x0C));
+
+                data.AddRange(spriteSheet.GenerateFrameBytes());
+            }
+
             return data.ToArray();
         }
     }

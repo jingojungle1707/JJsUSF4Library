@@ -106,7 +106,7 @@ namespace JJsUSF4Library
                 FileType.BAC => new BAC(),
                 FileType.BCM => new BCM(),
                 FileType.BVS => new BVS(),
-                FileType.BTR => new BTR(),
+                FileType.BTR => new FileClasses.BTRClasses.BTR(),
                 _ => new OtherFile(),
             };
         }

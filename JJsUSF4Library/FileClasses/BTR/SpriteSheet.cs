@@ -63,7 +63,7 @@ namespace JJsUSF4Library.FileClasses.BTRClasses
             }
         }
 
-        public List<byte> GenerateHeaderBytes()
+        public List<byte> GenerateHeaderBytes(out int frameDataPointerPosition)
         {
             List<byte> data = new List<byte>();
 
@@ -75,6 +75,35 @@ namespace JJsUSF4Library.FileClasses.BTRClasses
             USF4Utils.AddIntAsBytes(data, UnkLong0x04, true);
             USF4Utils.AddIntAsBytes(data, UnkShort0x08, false);
             USF4Utils.AddIntAsBytes(data, BitFlag0x0A, false);
+
+            data.AddRange(SpriteInstance.GenerateHeaderBytes());
+
+            if (BitFlag0x0A == 2)
+            {
+                frameDataPointerPosition = data.Count - 4;
+            }
+            else frameDataPointerPosition = -1;
+
+            return data;
+        }
+
+        public List<byte> GenerateFrameBytes()
+        {
+            List<byte> data = new List<byte>();
+
+            if (SpriteInstance.GetType() == typeof(AnimatedSpriteInstance))
+            {
+                AnimatedSpriteInstance instance = (AnimatedSpriteInstance)SpriteInstance;
+
+                foreach (AnimatedSpriteFrame frame in instance.Frames)
+                {
+                    USF4Utils.AddFloatAsBytes(data, frame.Frame);
+                    USF4Utils.AddFloatAsBytes(data, frame.XOffset);
+                    USF4Utils.AddFloatAsBytes(data, frame.YOffset);
+                    USF4Utils.AddFloatAsBytes(data, frame.Width);
+                    USF4Utils.AddFloatAsBytes(data, frame.Height);
+                }
+            }
 
             return data;
         }
