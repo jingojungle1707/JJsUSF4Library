@@ -105,7 +105,7 @@ namespace JJsUSF4Library.FileClasses.BTRClasses
                     }
                 }
 
-                data.AddRange(spriteSheet.GenerateHeaderBytes());
+                //data.AddRange(spriteSheet.GenerateHeaderBytes());
             }
             return data.ToArray();
         }

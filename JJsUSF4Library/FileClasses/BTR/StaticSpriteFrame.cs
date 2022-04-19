@@ -4,7 +4,7 @@ using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 
-namespace JJsUSF4Library.FileClasses.SubfileClasses
+namespace JJsUSF4Library.FileClasses.BTRClasses
 {
     public class StaticSpriteFrame : ISpriteFrame
     {

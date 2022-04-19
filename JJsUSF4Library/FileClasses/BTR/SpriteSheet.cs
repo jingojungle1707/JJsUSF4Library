@@ -5,7 +5,7 @@ using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 
-namespace JJsUSF4Library.FileClasses.SubfileClasses
+namespace JJsUSF4Library.FileClasses.BTRClasses
 {
     public class SpriteSheet
     {
@@ -63,7 +63,7 @@ namespace JJsUSF4Library.FileClasses.SubfileClasses
             }
         }
 
-        public List<byte> GenerateHeaderBytes(out int spriteInstancePointer)
+        public List<byte> GenerateHeaderBytes()
         {
             List<byte> data = new List<byte>();
 
