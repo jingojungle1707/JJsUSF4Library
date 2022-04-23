@@ -5,7 +5,7 @@ using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 
-namespace JJsUSF4Library.FileClasses.SubfileClasses
+namespace JJsUSF4Library.FileClasses.BVSClasses
 {
     public class GFX2
     {
@@ -14,7 +14,6 @@ namespace JJsUSF4Library.FileClasses.SubfileClasses
         public int GFX2ID { get; set; }
         public int UnkLong0x22 { get; set; }
         public int UnkLong0x26 { get; set; }
-        //public List<GFXResource> Resources { get; set; } = new List<GFXResource>();
 
         //0x2A short resource count
         //0x2C long resource pointer
@@ -22,7 +21,7 @@ namespace JJsUSF4Library.FileClasses.SubfileClasses
         {
 
         }
-        public GFX2(BinaryReader br, int offset = 0)
+        public GFX2(BinaryReader br, Dictionary<int, GFXResource> gfxResourcesByOffset, int offset = 0)
         {
             br.BaseStream.Seek(offset, SeekOrigin.Begin);
 
@@ -35,7 +34,7 @@ namespace JJsUSF4Library.FileClasses.SubfileClasses
 
             for (int i = 0; i < resourceCount; i++)
             {
-                ResourceItems.Add(new ResourceItem(br, offset + resourcePointer + i * 0x10));
+                ResourceItems.Add(new ResourceItem(br, gfxResourcesByOffset, offset + resourcePointer + i * 0x10));
             }
         }
         public List<byte> GenerateHeaderBytes()

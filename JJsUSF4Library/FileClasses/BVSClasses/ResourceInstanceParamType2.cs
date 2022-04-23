@@ -5,12 +5,12 @@ using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 
-namespace JJsUSF4Library.FileClasses.SubfileClasses
+namespace JJsUSF4Library.FileClasses.BVSClasses
 {
     public class ResourceInstanceParamType2
     {
-        public float UnkFloat0x00 { get; set; } 
-        public int UnkShort0x04 { get; set; } //Script ID? Another effect ID?
+        public float UnkFloat0x00 { get; set; }  //Always -1f?
+        public int ScriptID { get; set; } //Script ID? Another effect ID? can be -1, seen in RYX
         public int UnkShort0x06 { get; set; } //Unused, or previous field should be Long
         public int UnkShort0x08 { get; set; } // = 01
         public int UnkShort0x0A { get; set; } //Unused
@@ -28,7 +28,7 @@ namespace JJsUSF4Library.FileClasses.SubfileClasses
             br.BaseStream.Seek(offset, SeekOrigin.Begin);
 
             UnkFloat0x00 = br.ReadSingle();
-            UnkShort0x04 = br.ReadInt16();
+            ScriptID = br.ReadInt16();
             UnkShort0x06 = br.ReadInt16();
             UnkShort0x08 = br.ReadInt16();
             UnkShort0x0A = br.ReadInt16();
@@ -43,7 +43,7 @@ namespace JJsUSF4Library.FileClasses.SubfileClasses
             List<byte> data = new List<byte>();
 
             USF4Utils.AddFloatAsBytes(data, UnkFloat0x00);
-            USF4Utils.AddIntAsBytes(data, UnkShort0x04, false);
+            USF4Utils.AddIntAsBytes(data, ScriptID, false);
             USF4Utils.AddIntAsBytes(data, UnkShort0x06, false);
             USF4Utils.AddIntAsBytes(data, UnkShort0x08, false);
             USF4Utils.AddIntAsBytes(data, UnkShort0x0A, false);

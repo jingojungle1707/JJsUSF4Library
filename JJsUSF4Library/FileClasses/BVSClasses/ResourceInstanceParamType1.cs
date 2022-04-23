@@ -5,7 +5,7 @@ using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 
-namespace JJsUSF4Library.FileClasses.SubfileClasses
+namespace JJsUSF4Library.FileClasses.BVSClasses
 {
     public class ResourceInstanceParamType1
     {
@@ -16,7 +16,7 @@ namespace JJsUSF4Library.FileClasses.SubfileClasses
         public float UnkFloat0x10 { get; set; }
         public float UnkFloat0x14 { get; set; }
         public float UnkFloat0x18 { get; set; }
-        public float UnkFloat0x1C { get; set; }
+        public int UnkLong0x1C { get; set; } //Sometimes 0x01
         public ResourceInstanceParamType1()
         {
 
@@ -32,7 +32,7 @@ namespace JJsUSF4Library.FileClasses.SubfileClasses
             UnkFloat0x10 = br.ReadSingle();
             UnkFloat0x14 = br.ReadSingle();
             UnkFloat0x18 = br.ReadSingle();
-            UnkFloat0x1C = br.ReadSingle();
+            UnkLong0x1C = br.ReadInt32();
         }
         public List<byte> GenerateBytes()
         {
@@ -45,7 +45,7 @@ namespace JJsUSF4Library.FileClasses.SubfileClasses
             USF4Utils.AddFloatAsBytes(data, UnkFloat0x10);
             USF4Utils.AddFloatAsBytes(data, UnkFloat0x14);
             USF4Utils.AddFloatAsBytes(data, UnkFloat0x18);
-            USF4Utils.AddFloatAsBytes(data, UnkFloat0x1C);
+            USF4Utils.AddIntAsBytes(data, UnkLong0x1C, true);
 
             return data;
         }

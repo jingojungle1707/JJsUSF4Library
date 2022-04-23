@@ -5,7 +5,7 @@ using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 
-namespace JJsUSF4Library.FileClasses.SubfileClasses
+namespace JJsUSF4Library.FileClasses.BVSClasses
 {
     public class ResourceInstance
     {
@@ -48,10 +48,12 @@ namespace JJsUSF4Library.FileClasses.SubfileClasses
             UnkShort0x0A = br.ReadInt16();
             UnkShort0x0C = br.ReadInt16();
             UnkShort0x0E = br.ReadInt16();
+            //0x10
             UnkFloat0x10 = br.ReadSingle();
             UnkLong0x14 = br.ReadInt32();
             UnkLong0x18 = br.ReadInt32();
             UnkLong0x1C = br.ReadInt32();
+            //0x20
             UnkLong0x20 = br.ReadInt32();
             int paramsType1Count = br.ReadInt16();
             int paramsType2Count = br.ReadInt16();
