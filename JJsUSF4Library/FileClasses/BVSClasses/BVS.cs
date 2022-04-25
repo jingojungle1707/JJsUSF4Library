@@ -133,7 +133,6 @@ namespace JJsUSF4Library.FileClasses.BVSClasses
                 for (int j = 0; j < GFXs[i].ResourceItems.Count; j++)
                 {
                     gfxResourceItemResourcePointerPositions.Last().Add(data.Count);
-                    //resourceItemNameResourcePointerPositionPairs.Add(new (GFXs[i].ResourceItems[j].ResourceName, data.Count));
                     data.AddRange(GFXs[i].ResourceItems[j].GenerateBytes());
                 }
             }
@@ -154,7 +153,6 @@ namespace JJsUSF4Library.FileClasses.BVSClasses
                 for (int j = 0; j < GFX2s[i].ResourceItems.Count; j++)
                 {
                     gfx2ResourceItemResourcePointerPositions.Last().Add(data.Count);
-                    //resourceItemNameResourcePointerPositionPairs.Add(new(GFX2s[i].ResourceItems[j].ResourceName, data.Count));
                     data.AddRange(GFX2s[i].ResourceItems[j].GenerateBytes());
                 }
             }
