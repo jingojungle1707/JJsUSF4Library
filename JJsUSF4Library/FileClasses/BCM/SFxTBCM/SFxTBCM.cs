@@ -19,6 +19,7 @@ namespace JJsUSF4Library.FileClasses
         [Flags]
         public enum Inputs
         {
+            NONE = -1,
             UNK0 = 0x00,
             UP = 0x01,
             DOWN = 0x02,
@@ -36,7 +37,7 @@ namespace JJsUSF4Library.FileClasses
             UNK4 = 0x2000,
             UNK5 = 0x4000,
             UNK6 = 0x8000,
-            NONE = 0xFFFF
+            //NONE = 0xFFFF
         }
 
         //Header data
