@@ -42,7 +42,7 @@ namespace JJsUSF4Library.FileClasses.ScriptClasses
             USF4Utils.AddIntAsBytes(data, ChargeTime, false);
             USF4Utils.AddIntAsBytes(data, UnkShort4_0x08, false);
             USF4Utils.AddIntAsBytes(data, LossTime, false);
-            USF4Utils.AddIntAsBytes(data, StorageIndex, false);
+            USF4Utils.AddIntAsBytes(data, StorageIndex, true);
 
             return data;
         }

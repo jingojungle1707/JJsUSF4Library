@@ -222,10 +222,13 @@ namespace JJsUSF4Library.FileClasses
                 for (int i = 0; i < Cancels.Count; i++)
                 {
                     USF4Utils.UpdateIntAtPosition(data, cancelPointerPositions[i], data.Count - (cancelStartOffset + i * 0x08));
-
                     for (int j = 0; j < Cancels[i].CancelsInto.Count; j++)
                     {
-                        USF4Utils.AddIntAsBytes(data, moveNames.IndexOf(Cancels[i].CancelsInto[j]), false);
+                        if (Cancels[i].CancelsInto[j] == "!NONE")
+                        {
+                            USF4Utils.AddIntAsBytes(data, -1, false);
+                        }
+                        else USF4Utils.AddIntAsBytes(data, moveNames.IndexOf(Cancels[i].CancelsInto[j]), false);
                     }
                 }
             }

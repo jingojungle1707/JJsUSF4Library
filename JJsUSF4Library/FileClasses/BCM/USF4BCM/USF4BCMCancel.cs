@@ -26,7 +26,12 @@ namespace JJsUSF4Library.FileClasses.ScriptClasses
 
             br.BaseStream.Seek(offset + cancellableMovesPointer, SeekOrigin.Begin);
 
-            for (int i = 0; i < cancellableMoveCount; i++) CancelsInto.Add(moveNames[br.ReadInt16()]);   
+            for (int i = 0; i < cancellableMoveCount; i++)
+            {
+                int moveId = br.ReadInt16();
+                if (moveId > -1) CancelsInto.Add(moveNames[moveId]);
+                else CancelsInto.Add("!NONE");
+            }
         }
     }
 }

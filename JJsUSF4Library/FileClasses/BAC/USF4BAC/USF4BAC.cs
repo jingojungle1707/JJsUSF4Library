@@ -115,16 +115,16 @@ namespace JJsUSF4Library.FileClasses
             //0x10
             USF4Utils.AddIntAsBytes(Data, Hitboxes.Count, true);
             int scriptIndexPointerPosition = Data.Count;
-            USF4Utils.AddIntAsBytes(Data, -1, true);
+            USF4Utils.AddIntAsBytes(Data, 0, true);
             int vFXIndexPointerPosition = Data.Count;
-            USF4Utils.AddIntAsBytes(Data, -1, true);
+            USF4Utils.AddIntAsBytes(Data, 0, true);
             int scriptNameIndexPointerPosition = Data.Count;
-            USF4Utils.AddIntAsBytes(Data, -1, true);
+            USF4Utils.AddIntAsBytes(Data, 0, true);
             //0x20
             int vfxNameIndexPointerPosition = Data.Count;
-            USF4Utils.AddIntAsBytes(Data, -1, true);
+            USF4Utils.AddIntAsBytes(Data, 0, true);
             int hitboxIndexPointerPosition = Data.Count;
-            USF4Utils.AddIntAsBytes(Data, -1, true);
+            USF4Utils.AddIntAsBytes(Data, 0, true);
             //Write mystery floats
             for (int i = 0; i < 0xA8; i++) USF4Utils.AddFloatAsBytes(Data, MysteryFloatBlock_0x28[i]);
             //Write script pointers
@@ -133,15 +133,15 @@ namespace JJsUSF4Library.FileClasses
             for (int i = 0; i < Scripts.Count; i++)
             {
                 scriptPointerPositions.Add(Data.Count);
-                USF4Utils.AddIntAsBytes(Data, -1, true);
+                USF4Utils.AddIntAsBytes(Data, 0, true);
             }
             List<int> vfxPointerPositions = new List<int>();
             //Write VFX script pointers
-            USF4Utils.UpdateIntAtPosition(Data, vFXIndexPointerPosition, Data.Count);
+            if (VFXScripts.Count > 0) USF4Utils.UpdateIntAtPosition(Data, vFXIndexPointerPosition, Data.Count);
             for (int i = 0; i < VFXScripts.Count; i++)
             {
                 vfxPointerPositions.Add(Data.Count);
-                USF4Utils.AddIntAsBytes(Data, -1, true);
+                USF4Utils.AddIntAsBytes(Data, 0, true);
             }
             //Write script name pointers
             List<int> scriptNamePointerPositions = new List<int>();
@@ -149,15 +149,15 @@ namespace JJsUSF4Library.FileClasses
             for (int i = 0; i < Scripts.Count; i++)
             {
                 scriptNamePointerPositions.Add(Data.Count);
-                USF4Utils.AddIntAsBytes(Data, -1, true);
+                USF4Utils.AddIntAsBytes(Data, 0, true);
             }
             //Write vfx name pointers
             List<int> vfxNamePointerPositions = new List<int>();
-            USF4Utils.UpdateIntAtPosition(Data, vfxNameIndexPointerPosition, Data.Count);
+            if (VFXScripts.Count > 0) USF4Utils.UpdateIntAtPosition(Data, vfxNameIndexPointerPosition, Data.Count);
             for (int i = 0; i < VFXScripts.Count; i++)
             {
                 vfxNamePointerPositions.Add(Data.Count);
-                USF4Utils.AddIntAsBytes(Data, -1, true);
+                USF4Utils.AddIntAsBytes(Data, 0, true);
             }
             //Write hitbox pointers
             List<int> hitboxPointerPositions = new List<int>();
@@ -165,7 +165,7 @@ namespace JJsUSF4Library.FileClasses
             for (int i = 0; i < Hitboxes.Count; i++)
             {
                 hitboxPointerPositions.Add(Data.Count);
-                USF4Utils.AddIntAsBytes(Data, -1, true);
+                USF4Utils.AddIntAsBytes(Data, 0, true);
             }
             //Write scripts
             for (int i = 0; i < Scripts.Count; i++)
