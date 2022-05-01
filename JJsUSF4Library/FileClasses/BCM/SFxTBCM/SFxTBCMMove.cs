@@ -17,10 +17,10 @@ namespace JJsUSF4Library.FileClasses.ScriptClasses
             UnkShort4_0x08,
             UnkShort5_0x0A;
         public float
-            UnknownFloat_0x0C;
+            PositionRestrictionDistance;
         //0x10
         public int
-            PositionRestrictionDistance,
+            UnkLong7_0x10,
             Restriction,
             UnkShort9_0x14,
             UnkShort10_0x16,
@@ -98,9 +98,9 @@ namespace JJsUSF4Library.FileClasses.ScriptClasses
             UnkShort3_0x06 = br.ReadInt16();
             UnkShort4_0x08 = br.ReadInt16();
             UnkShort5_0x0A = br.ReadInt16();
-            UnknownFloat_0x0C = br.ReadSingle();
+            PositionRestrictionDistance = br.ReadSingle();
             //0x10
-            PositionRestrictionDistance = br.ReadInt16();
+            UnkLong7_0x10 = br.ReadInt16();
             Restriction = br.ReadInt16();
             UnkShort9_0x14 = br.ReadInt16();
             UnkShort10_0x16 = br.ReadInt16();
@@ -140,9 +140,9 @@ namespace JJsUSF4Library.FileClasses.ScriptClasses
             UnkShort3_0x06 = USF4Utils.ReadInt(false, 0x06, Data);
             UnkShort4_0x08 = USF4Utils.ReadInt(false, 0x08, Data);
             UnkShort5_0x0A = USF4Utils.ReadInt(false, 0x0A, Data);
-            UnknownFloat_0x0C = USF4Utils.ReadFloat(0x0C, Data);
+            PositionRestrictionDistance = USF4Utils.ReadFloat(0x0C, Data);
             //0x10
-            PositionRestrictionDistance = USF4Utils.ReadInt(false, 0x10, Data);
+            UnkLong7_0x10 = USF4Utils.ReadInt(false, 0x10, Data);
             Restriction = USF4Utils.ReadInt(false, 0x12, Data);
             UnkShort9_0x14 = USF4Utils.ReadInt(false, 0x14, Data);
             UnkShort10_0x16 = USF4Utils.ReadInt(false, 0x16, Data);

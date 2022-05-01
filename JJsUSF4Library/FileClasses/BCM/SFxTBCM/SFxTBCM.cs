@@ -379,9 +379,9 @@ namespace JJsUSF4Library.FileClasses
                 USF4Utils.AddIntAsBytes(Data, Moves[i].UnkShort3_0x06, false);
                 USF4Utils.AddIntAsBytes(Data, Moves[i].UnkShort4_0x08, false);
                 USF4Utils.AddIntAsBytes(Data, Moves[i].UnkShort5_0x0A, false);
-                USF4Utils.AddFloatAsBytes(Data, Moves[i].UnknownFloat_0x0C);
+                USF4Utils.AddFloatAsBytes(Data, Moves[i].PositionRestrictionDistance);
                 //0x10
-                USF4Utils.AddIntAsBytes(Data, Moves[i].PositionRestrictionDistance, false);
+                USF4Utils.AddIntAsBytes(Data, Moves[i].UnkLong7_0x10, false);
                 USF4Utils.AddIntAsBytes(Data, Moves[i].Restriction, false);
                 USF4Utils.AddIntAsBytes(Data, Moves[i].UnkShort9_0x14, false);
                 USF4Utils.AddIntAsBytes(Data, Moves[i].UnkShort10_0x16, false);

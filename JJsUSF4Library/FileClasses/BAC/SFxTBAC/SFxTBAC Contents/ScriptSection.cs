@@ -125,12 +125,12 @@ namespace JJsUSF4Library.FileClasses.ScriptClasses
             public enum AnimationFile
             {
                 COMMON = 0x00,
-                UNK1 = 0x01,
+                UNK1 = 0x01, //Could be CMN.cam.ema from resource\battle\chara\CMN? Appears in unused cody ex knifethrow?
                 OBJ = 0x02,
                 CAM = 0x03,
                 FCE = 0x04,
-                UNK5 = 0x05,
-                UNK6 = 0x06,
+                INTRO = 0x05,
+                APPEAL = 0x06,
                 UNK7 = 0x07,
                 UNK8 = 0x08,
                 UNK9 = 0x09,
