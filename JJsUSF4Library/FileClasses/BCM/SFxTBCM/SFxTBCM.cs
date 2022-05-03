@@ -383,7 +383,7 @@ namespace JJsUSF4Library.FileClasses
                 //0x10
                 USF4Utils.AddIntAsBytes(Data, Moves[i].UnkLong7_0x10, false);
                 USF4Utils.AddIntAsBytes(Data, Moves[i].Restriction, false);
-                USF4Utils.AddIntAsBytes(Data, Moves[i].UnkShort9_0x14, false);
+                USF4Utils.AddIntAsBytes(Data, Moves[i].StanceRestriction, false);
                 USF4Utils.AddIntAsBytes(Data, Moves[i].UnkShort10_0x16, false);
                 USF4Utils.AddIntAsBytes(Data, Moves[i].MeterReq, false);
                 USF4Utils.AddIntAsBytes(Data, Moves[i].MeterLoss, false);

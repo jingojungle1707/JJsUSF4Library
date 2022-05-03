@@ -22,7 +22,7 @@ namespace JJsUSF4Library.FileClasses.ScriptClasses
         public int
             UnkLong7_0x10,
             Restriction,
-            UnkShort9_0x14,
+            StanceRestriction,
             UnkShort10_0x16,
             MeterReq,
             MeterLoss;
@@ -102,7 +102,7 @@ namespace JJsUSF4Library.FileClasses.ScriptClasses
             //0x10
             UnkLong7_0x10 = br.ReadInt16();
             Restriction = br.ReadInt16();
-            UnkShort9_0x14 = br.ReadInt16();
+            StanceRestriction = br.ReadInt16();
             UnkShort10_0x16 = br.ReadInt16();
             MeterReq = br.ReadInt16();
             MeterLoss = br.ReadInt16();
@@ -144,7 +144,7 @@ namespace JJsUSF4Library.FileClasses.ScriptClasses
             //0x10
             UnkLong7_0x10 = USF4Utils.ReadInt(false, 0x10, Data);
             Restriction = USF4Utils.ReadInt(false, 0x12, Data);
-            UnkShort9_0x14 = USF4Utils.ReadInt(false, 0x14, Data);
+            StanceRestriction = USF4Utils.ReadInt(false, 0x14, Data);
             UnkShort10_0x16 = USF4Utils.ReadInt(false, 0x16, Data);
             MeterReq = USF4Utils.ReadInt(false, 0x18, Data);
             MeterLoss = USF4Utils.ReadInt(false, 0x1A, Data);
