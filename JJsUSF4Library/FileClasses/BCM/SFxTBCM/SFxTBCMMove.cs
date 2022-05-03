@@ -22,7 +22,7 @@ namespace JJsUSF4Library.FileClasses.ScriptClasses
         public int
             UnkLong7_0x10,
             Restriction,
-            UnkShort9_0x14,
+            StanceRestriction,
             UnkShort10_0x16,
             MeterReq,
             MeterLoss;
