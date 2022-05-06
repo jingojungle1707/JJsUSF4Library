@@ -115,7 +115,7 @@ namespace JJsUSF4Library
             return fileversion switch
             {
                 BACFileVersion.SF4 => new USF4BAC(),
-                BACFileVersion.SXT => new SFxTBAC(),
+                BACFileVersion.SXT => new FileClasses.BACClasses.SFxTBACClasses.SFxTBAC(),
                 BACFileVersion.UNK => new OtherFile(),
                 _ => new OtherFile(),
             };

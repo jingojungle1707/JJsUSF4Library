@@ -4,7 +4,7 @@ using System.Linq;
 using System.Text;
 using System.Xml.Serialization;
 
-namespace JJsUSF4Library.FileClasses.ScriptClasses
+namespace JJsUSF4Library.FileClasses.BACClasses.SFxTBACClasses
 {
     public class ScriptFile
     {
@@ -59,31 +59,6 @@ namespace JJsUSF4Library.FileClasses.ScriptClasses
             {
                 if (scriptPointers[i] == 0) Scripts.Add(new SFxTScript());
                 else Scripts.Add(new SFxTScript(br, scriptNames[i], offset + scriptPointers[i]));
-            }
-        }
-
-        public ScriptFile(byte[] Data, int Offset, string name)
-        {
-            int os = Offset;
-            Name = name;
-            Scripts = new List<SFxTScript>();
-            List<int> scriptPointers = new List<int>();
-            List<int> scriptNamePointers = new List<int>();
-
-            UnkShort0_0x00 = USF4Utils.ReadInt(false, os + 0x00, Data);
-            int scriptCount = USF4Utils.ReadInt(false, os + 0x02, Data);
-            int scriptIndexPointer = USF4Utils.ReadInt(true, os + 0x04, Data);
-            int scriptNameIndexPointer = USF4Utils.ReadInt(true, os + 0x08, Data);
-
-            for (int i = 0; i < scriptCount; i++)
-            {
-                scriptPointers.Add(USF4Utils.ReadInt(true, os + scriptIndexPointer + i * 4, Data));
-                scriptNamePointers.Add(USF4Utils.ReadInt(true, os + scriptNameIndexPointer + i * 4, Data));
-                if (scriptPointers[i] != 0 && scriptNamePointers[i] != 0)
-                {
-                    Scripts.Add(new SFxTScript(Data, os + scriptPointers[i], Encoding.ASCII.GetString(USF4Utils.ReadZeroTermStringToArray(os + scriptNamePointers[i], Data, Data.Length))));
-                }
-                else Scripts.Add(new SFxTScript());
             }
         }
     }

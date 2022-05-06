@@ -6,7 +6,7 @@ using System.IO;
 using System.Linq;
 using System.Text;
 
-namespace JJsUSF4Library.FileClasses
+namespace JJsUSF4Library.FileClasses.BACClasses.SFxTBACClasses
 {
     public class SFxTBAC : BAC
     {

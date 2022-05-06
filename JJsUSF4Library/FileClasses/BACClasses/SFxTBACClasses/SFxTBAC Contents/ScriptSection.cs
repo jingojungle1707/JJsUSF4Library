@@ -1,17 +1,18 @@
-﻿using System;
+﻿using JJsUSF4Library.FileClasses.ScriptClasses;
+using System;
 using System.Collections.Generic;
 using System.IO;
 using System.Linq;
 
-namespace JJsUSF4Library.FileClasses.ScriptClasses
+namespace JJsUSF4Library.FileClasses.BACClasses.SFxTBACClasses
 {
     public class ScriptSection
     {
-        public Command.COMMANDTYPE Type;
+        public CommandBase.COMMANDTYPE Type;
         public byte
             UnkByte1_0x01;
 
-        public List<Command> Commands;
+        public List<CommandBase> Commands;
 
         public ScriptSection()
         {
@@ -20,11 +21,11 @@ namespace JJsUSF4Library.FileClasses.ScriptClasses
 
         public ScriptSection(BinaryReader br, int offset = 0)
         {
-            Commands = new List<Command>();
+            Commands = new List<CommandBase>();
 
             br.BaseStream.Seek(offset, SeekOrigin.Begin);
 
-            Type = (Command.COMMANDTYPE)br.ReadByte();
+            Type = (CommandBase.COMMANDTYPE)br.ReadByte();
             UnkByte1_0x01 = br.ReadByte();
             int commandCount = br.ReadInt16();
             int commandTicksPointer = br.ReadInt32();
@@ -43,28 +44,8 @@ namespace JJsUSF4Library.FileClasses.ScriptClasses
             br.BaseStream.Seek(offset + commandDatasPointer, SeekOrigin.Begin);
             for (int i = 0; i < commandCount; i++)
             {
-                Commands.Add(new Command(br, Type, startTicks[i], endTicks[i]));
-            }
-        }
-
-        public ScriptSection(byte[] Data)
-        {
-            Type = (Command.COMMANDTYPE)Data[0];
-            UnkByte1_0x01 = Data[1];
-            int commandCount = USF4Utils.ReadInt(false, 0x02, Data);
-            int commandHeadersPointer = USF4Utils.ReadInt(true, 0x04, Data);
-            int commandDatasPointer = USF4Utils.ReadInt(true, 0x08, Data);
-
-            Commands = new List<Command>();
-
-            for (int i = 0; i < commandCount; i++)
-            {
-                Commands.Add(new Command(
-                    Data.Slice(commandDatasPointer + i * Command.CommandLengths[Type], 0),
-                    Type,
-                    USF4Utils.ReadInt(false, commandHeadersPointer + i * 0x04, Data),
-                    USF4Utils.ReadInt(false, commandHeadersPointer + 0x02 + i * 0x04, Data)
-                ));
+                //Commands.Add(new Command(br, Type, startTicks[i], endTicks[i]));
+                Commands.Add(CommandFactory.ReadCommandBlock(br, Type, startTicks[i], endTicks[i]));
             }
         }
 
@@ -74,30 +55,23 @@ namespace JJsUSF4Library.FileClasses.ScriptClasses
 
             for (int i = 0; i < Commands.Count; i++)
             {
-                Data.AddRange(Commands[i].CommandData.GenerateDataBlockBytes());
+                Data.AddRange(Commands[i].GenerateDataBlockBytes());
             }
-            //Check for types that contain params
-            if (new Command.COMMANDTYPE[] { 
-                Command.COMMANDTYPE.Flow, 
-                Command.COMMANDTYPE.ETC, 
-                Command.COMMANDTYPE.Unk6, 
-                Command.COMMANDTYPE.SFX, 
-                Command.COMMANDTYPE.GFX }
-                .Contains(Type))
-            {
-                int commandLength = (Type == Command.COMMANDTYPE.Flow) ? 0x0C : 0x08;
-                int commandOffset = (Type == Command.COMMANDTYPE.Flow) ? 0x08 : 0x04;
 
-                for (int i = 0; i < Commands.Count; i++)
+            int commandLength = (Type == CommandBase.COMMANDTYPE.Flow) ? 0x0C : 0x08;
+            int commandOffset = (Type == CommandBase.COMMANDTYPE.Flow) ? 0x08 : 0x04;
+
+            for (int i = 0; i < Commands.Count; i++)
+            {
+                CommandHasParamsBase paramCommand = Commands[i] as CommandHasParamsBase;
+
+                if (paramCommand != null && paramCommand.Params.Count > 0)
                 {
-                    if (Commands[i].CommandData.Params != null && Commands[i].CommandData.Params.Count > 0)
-                    {
-                        USF4Utils.UpdateIntAtPosition(Data, i * commandLength + commandOffset, Data.Count - i * commandLength);
-                        Data.AddRange(Commands[i].CommandData.GenerateParamBytes());
-                    }
+                    USF4Utils.UpdateIntAtPosition(Data, i * commandLength + commandOffset, Data.Count - i * commandLength);
+                    Data.AddRange(paramCommand.GenerateParamBytes());
                 }
             }
-
+            
             return Data.ToArray();
         }
     }

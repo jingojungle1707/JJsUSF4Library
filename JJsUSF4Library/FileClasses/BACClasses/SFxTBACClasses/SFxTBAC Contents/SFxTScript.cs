@@ -1,7 +1,7 @@
 ﻿using System.Collections.Generic;
 using System.IO;
 
-namespace JJsUSF4Library.FileClasses.ScriptClasses
+namespace JJsUSF4Library.FileClasses.BACClasses.SFxTBACClasses
 {
     public class SFxTScript
     {
@@ -56,33 +56,6 @@ namespace JJsUSF4Library.FileClasses.ScriptClasses
             //Read script sections - each header is length 0x0C, so we use i * 0x0C for each section's start offset
             for (int i = 0; i < scriptSectionCount; i++) ScriptSections.Add(new ScriptSection(br, offset + 0x20 + i * 0x0C));
         }
-
-        public SFxTScript(byte[] Data, int Offset, string name)
-        {
-            int os = Offset;
-            Name = name;
-            HitboxStart = USF4Utils.ReadInt(false, os + 0x00, Data);
-            HitboxEnd = USF4Utils.ReadInt(false, os + 0x02, Data);
-            IASA = USF4Utils.ReadInt(false, os + 0x04, Data);
-            End = USF4Utils.ReadInt(false, os + 0x06, Data);
-            UnkLong4_0x08 = USF4Utils.ReadInt(true, os + 0x08, Data);
-            XOffset = USF4Utils.ReadFloat(os + 0x0C, Data);
-            //0x10
-            ScriptFlags = USF4Utils.ReadInt(false, os + 0x10, Data);
-            EndsOn_ = USF4Utils.ReadInt(false, os + 0x12, Data);
-            Loop = USF4Utils.ReadInt(true, os + 0x14, Data);
-            int scriptSectionCount = USF4Utils.ReadInt(true, os + 0x18, Data);
-            int scriptSectionPointer = USF4Utils.ReadInt(true, os + 0x1C, Data);
-
-            ScriptSections = new List<ScriptSection>();
-
-            //Each script section header is length 0x0C, and all internal pointers count from their own header position
-            //So we just pass from the header position to the end of the file
-            for (int i = 0; i < scriptSectionCount; i++)
-            {
-                ScriptSections.Add(new ScriptSection(Data.Slice(os + scriptSectionPointer + i * 0x0C, 0)));
-            }
-        }
         #endregion
 
         #region Methods
@@ -111,8 +84,8 @@ namespace JJsUSF4Library.FileClasses.ScriptClasses
 
                 for (int j = 0; j < ss.Commands.Count; j++)
                 {
-                    USF4Utils.AddIntAsBytes(Data, ss.Commands[j].CommandData.StartTick, false);
-                    USF4Utils.AddIntAsBytes(Data, ss.Commands[j].CommandData.EndTick, false);
+                    USF4Utils.AddIntAsBytes(Data, ss.Commands[j].StartTick, false);
+                    USF4Utils.AddIntAsBytes(Data, ss.Commands[j].EndTick, false);
                 }
 
                 USF4Utils.UpdateIntAtPosition(Data, CommandDataPointerPositions[i], Data.Count - i * 0x0c);

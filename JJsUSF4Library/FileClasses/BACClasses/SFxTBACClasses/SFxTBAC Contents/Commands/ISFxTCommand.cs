@@ -7,7 +7,7 @@ using System.Threading.Tasks;
 
 namespace JJsUSF4Library.FileClasses.BACClasses.SFxTBACClasses
 {
-    internal interface ISFxTCommand
+    public interface ISFxTCommand
     {
         int StartTick { get; set; }
         int EndTick { get; set; }
