@@ -5,13 +5,13 @@ namespace JJsUSF4Library.FileClasses.BACClasses.SFxTBACClasses
 {
     public class FlowCommand : CommandHasParamsBase
     {
-        public FlowType Type;
+        public FlowType Type { get; set; }
         
-        public int
-            UnkByte1_0x01,
-            UnkByte3_0x03,
-            Script,
-            UnkShort4_0x06;
+        
+        public byte UnkByte1_0x01 { get; set; }
+        public byte UnkByte3_0x03 { get; set; }
+        public short Script { get; set; }
+        public short UnkShort4_0x06 { get; set; }
         public FlowCommand() { }
 
         public override void ReadCommandDataBlock(BinaryReader br, int startTick, int endTick)
@@ -34,26 +34,6 @@ namespace JJsUSF4Library.FileClasses.BACClasses.SFxTBACClasses
 
             //Read params
             if (paramsCount > 0) ReadParamData(br, paramsCount, paramsPointer + startOffset);
-        }
-        public FlowCommand(byte[] Data, int startTick, int endTick)
-        {
-            Params = new List<int>();
-
-            StartTick = startTick;
-            EndTick = endTick;
-
-            Type = (FlowType)Data[0];
-            UnkByte1_0x01 = Data[1];
-            int paramsCount = Data[2];
-            UnkByte3_0x03 = Data[3];
-            Script = USF4Utils.ReadInt(false, 0x04, Data);
-            UnkShort4_0x06 = USF4Utils.ReadInt(false, 0x06, Data);
-            int paramsPointer = USF4Utils.ReadInt(true, 0x0A, Data);
-
-            for (int i = 0; i < paramsCount; i++)
-            {
-                Params.Add(USF4Utils.ReadInt(true, paramsPointer + i * 0x04, Data));
-            }
         }
 
         public override byte[] GenerateDataBlockBytes()

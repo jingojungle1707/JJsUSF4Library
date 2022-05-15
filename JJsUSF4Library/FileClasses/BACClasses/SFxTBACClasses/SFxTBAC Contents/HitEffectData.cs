@@ -78,11 +78,23 @@ namespace JJsUSF4Library.FileClasses.ScriptClasses
         public enum HitEffectFlag
         {
             UNKOTHER = -1,
-            NONE = 0x00,
-            USE_LOCAL_SCRIPT = 0x01,
-            UNK0x02 = 0x02,
-            UNK0x04 = 0x04,
-            HARD_KNOCKDOWN = 0x08
+            NONE = 0x0000,
+            USE_LOCAL_SCRIPT = 0x0001,
+            DONT_KO = 0x0002,
+            UNK0x0004 = 0x0004, //No turn?
+            HARD_KNOCKDOWN = 0x0008,
+            UNK0x0010 = 0x0010,
+            UNK0x0020 = 0x0020,
+            UNK0x0040 = 0x0040,
+            UNK0x0080 = 0x0080,
+            UNK0x0100 = 0x0100,
+            UNK0x0200 = 0x0200,
+            UNK0x0400 = 0x0400,
+            UNK0x0800 = 0x0800,
+            UNK0x1000 = 0x1000,
+            UNK0x2000 = 0x2000,
+            UNK0x4000 = 0x4000,
+            UNK0x8000 = 0x8000,
         }
 
         public HitEffectData()

@@ -9,9 +9,8 @@ namespace JJsUSF4Library.FileClasses.BACClasses.SFxTBACClasses
 {
     public class SFXCommand : CommandHasParamsBase
     {
-        public int
-            ID, //short
-            File; //byte
+        public short ID { get; set; } //short
+        public byte File { get; set; } //byte
 
         public SFXCommand() { }
         public override void ReadCommandDataBlock(BinaryReader br, int startTick, int endTick)

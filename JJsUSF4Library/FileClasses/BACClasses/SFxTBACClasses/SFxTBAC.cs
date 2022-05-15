@@ -227,11 +227,12 @@ namespace JJsUSF4Library.FileClasses.BACClasses.SFxTBACClasses
                     USF4Utils.AddIntAsBytes(data, s.HitboxEnd, false);
                     USF4Utils.AddIntAsBytes(data, s.IASA, false);
                     USF4Utils.AddIntAsBytes(data, s.End, false);
-                    USF4Utils.AddIntAsBytes(data, s.UnkLong4_0x08, true);
+                    USF4Utils.AddIntAsBytes(data, (short)s.PhysicsFlags, false);
+                    USF4Utils.AddIntAsBytes(data, s.UnkShort5_0x0A, false);
                     USF4Utils.AddFloatAsBytes(data, s.XOffset);
                     USF4Utils.AddIntAsBytes(data, s.ScriptFlags, false);
                     USF4Utils.AddIntAsBytes(data, s.EndsOn_, false);
-                    USF4Utils.AddIntAsBytes(data, s.Loop, true);
+                    USF4Utils.AddIntAsBytes(data, s.LoopToFrame, true);
                     USF4Utils.AddIntAsBytes(data, s.ScriptSections.Count, true);
                     USF4Utils.AddIntAsBytes(data, 0x20, true); //ScriptSectionPointer; should always be 0x20 so don't bother with "update"
 

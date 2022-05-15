@@ -12,15 +12,14 @@ namespace JJsUSF4Library.FileClasses.BACClasses.SFxTBACClasses
         [Flags]
         public enum Conditions
         {
+            START = 0x00,
             ON_HIT = 0x01,
             ON_BLOCK = 0x02,
             UNK0x04 = 0x04,
             END = 0x08
         }
-
-        public int
-            CancelList;
-        public Conditions Condition;
+        public int CancelList { get; set; }
+        public Conditions Condition { get; set; }
 
         //Cancel "Type"? Is this equivalent to ONO's cancel "Condition"?
         //Defines on hit/on block settings?

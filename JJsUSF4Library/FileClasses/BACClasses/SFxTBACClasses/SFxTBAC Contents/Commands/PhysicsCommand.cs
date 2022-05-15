@@ -9,12 +9,11 @@ namespace JJsUSF4Library.FileClasses.BACClasses.SFxTBACClasses
 {
     public class PhysicsCommand : CommandBase
     {
-        public float Force;
-        public PhysicsFlags Flags;
-        public int
-            UnkShort2_0x06,
-            UnkShort3_0x08,
-            UnkShort4_0x0A;
+        public float Force { get; set; }
+        public PhysicsFlags Flags { get; set; }
+        public int UnkShort2_0x06 { get; set; }
+        public int UnkShort3_0x08 { get; set; }
+        public int UnkShort4_0x0A { get; set; }
 
         [Flags]
         public enum PhysicsFlags
@@ -55,7 +54,7 @@ namespace JJsUSF4Library.FileClasses.BACClasses.SFxTBACClasses
             StartTick = startTick;
             EndTick = endTick;
             Force = br.ReadSingle();
-            Flags = (PhysicsFlags)br.ReadInt16();
+            Flags = (PhysicsFlags)br.ReadUInt16();
             UnkShort2_0x06 = br.ReadInt16();
             UnkShort3_0x08 = br.ReadInt16();
             UnkShort4_0x0A = br.ReadInt16();

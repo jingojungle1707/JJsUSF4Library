@@ -17,7 +17,7 @@ namespace JJsUSF4Library.FileClasses.BACClasses.SFxTBACClasses
             
             return command;
         }
-        public static CommandBase FetchCommandDataBlockType(CommandBase.COMMANDTYPE type)
+        private static CommandBase FetchCommandDataBlockType(CommandBase.COMMANDTYPE type)
         {
             return type switch
             {

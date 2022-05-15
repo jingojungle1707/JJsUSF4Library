@@ -9,7 +9,7 @@ namespace JJsUSF4Library.FileClasses.BACClasses.SFxTBACClasses
 {
     public class SpeedCommand : CommandBase
     {
-        public float Multiplier;
+        public float Multiplier { get; set; }
         public SpeedCommand() { }
         public SpeedCommand(byte[] Data, int startTick, int endTick)
         {

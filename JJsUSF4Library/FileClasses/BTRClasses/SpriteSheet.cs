@@ -12,10 +12,10 @@ namespace JJsUSF4Library.FileClasses.BTRClasses
         public byte SpriteSheetID { get; set; } //Maybe? Seems to increment when there's multiple sheets
         public byte TextureIndex { get; set; }
         public byte UnkByte0x02 { get; set; }   //0x22, 0x21
-        public byte UnkByte0x03 { get; set; }   //both always 0x22?
+        public byte UnkByte0x03 { get; set; }   //0x22?
         public int UnkLong0x04 { get; set; }
-        public int UnkShort0x08 { get; set; }
-        public int BitFlag0x0A { get; set; } // SHORT 0x00 for still image, 0x02 for animated
+        public short UnkShort0x08 { get; set; }
+        public short BitFlag0x0A { get; set; } // SHORT 0x00 for still image, 0x02 for animated
         public ISpriteInstance SpriteInstance { get; set; }
 
         public SpriteSheet()

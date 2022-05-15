@@ -9,14 +9,11 @@ namespace JJsUSF4Library.FileClasses.BACClasses.SFxTBACClasses
 {
     public class AnimationCommand : CommandBase
     {
-        public int
-            ID; //Short
-        public AnimationFile File;
-        public byte
-            Flags;
-        public int
-            Start, //Short
-            End; //Short
+        public short ID { get; set; } //Short
+        public AnimationFile File { get; set; }
+        public byte Flags { get; set; }
+        public short Start { get; set; } //Short
+        public short End { get; set; } //Short
 
         public AnimationCommand() { }
         public override void ReadCommandDataBlock(BinaryReader br, int startTick, int endTick)

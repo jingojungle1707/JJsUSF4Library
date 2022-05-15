@@ -9,10 +9,9 @@ namespace JJsUSF4Library.FileClasses.BACClasses.SFxTBACClasses
 {
     public class AnimationModCommand : CommandBase
     {
-        public int
-            UnkShort0_0x00,
-            UnkShort1_0x02;
-        public float UnkFloat2_0x04;
+        public int UnkShort0_0x00 { get; set; }
+        public int UnkShort1_0x02 { get; set; }
+        public float UnkFloat2_0x04 { get; set; }
 
         public AnimationModCommand() { }
         public override void ReadCommandDataBlock(BinaryReader br, int startTick, int endTick)

@@ -19,9 +19,9 @@ namespace JJsUSF4Library.FileClasses.ScriptClasses
         public float
             PositionRestrictionDistance;
         //0x10
+        public int ProjectileRestriction;
+        public RestrictionFlags Restriction;
         public int
-            UnkLong7_0x10,
-            Restriction,
             StanceRestriction,
             UnkShort10_0x16,
             MeterReq,
@@ -59,6 +59,23 @@ namespace JJsUSF4Library.FileClasses.ScriptClasses
             CLOSE = 0x01,
             FAR = 0x02,
             HIGH = 0x03
+        }
+        [Flags]
+        public enum RestrictionFlags
+        {
+            NONE = 0x0000,
+            THROW = 0x0001,
+            LAUNCHER = 0x0002,
+            TAG = 0x0004,
+            TAUNT = 0x0008,
+            UNK0x10 = 0x0010,
+            SPECIAL = 0x0020,
+            ALPHA_COUNTER = 0x0040,
+            UNK0x80 = 0x0080,
+            CROSS_ART = 0x0100,
+            CROSS_ASSAULT = 0x0200,
+            PANDORA = 0x0400,
+            CHARGEABLE = 0x0800,
         }
         [Flags]
         public enum InputFlag
@@ -100,8 +117,8 @@ namespace JJsUSF4Library.FileClasses.ScriptClasses
             UnkShort5_0x0A = br.ReadInt16();
             PositionRestrictionDistance = br.ReadSingle();
             //0x10
-            UnkLong7_0x10 = br.ReadInt16();
-            Restriction = br.ReadInt16();
+            ProjectileRestriction = br.ReadInt16();
+            Restriction = (RestrictionFlags)br.ReadInt16();
             StanceRestriction = br.ReadInt16();
             UnkShort10_0x16 = br.ReadInt16();
             MeterReq = br.ReadInt16();
@@ -142,8 +159,8 @@ namespace JJsUSF4Library.FileClasses.ScriptClasses
             UnkShort5_0x0A = USF4Utils.ReadInt(false, 0x0A, Data);
             PositionRestrictionDistance = USF4Utils.ReadFloat(0x0C, Data);
             //0x10
-            UnkLong7_0x10 = USF4Utils.ReadInt(false, 0x10, Data);
-            Restriction = USF4Utils.ReadInt(false, 0x12, Data);
+            ProjectileRestriction = USF4Utils.ReadInt(false, 0x10, Data);
+            Restriction = (RestrictionFlags)USF4Utils.ReadInt(false, 0x12, Data);
             StanceRestriction = USF4Utils.ReadInt(false, 0x14, Data);
             UnkShort10_0x16 = USF4Utils.ReadInt(false, 0x16, Data);
             MeterReq = USF4Utils.ReadInt(false, 0x18, Data);

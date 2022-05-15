@@ -9,13 +9,14 @@ namespace JJsUSF4Library.FileClasses.BACClasses.SFxTBACClasses
 {
     public class PushboxCommand : CommandBase
     {
-        public float
-            X, Y, Width, Height;
-        public int
-            UnkShort4_0x10,
-            UnkShort5_0x12,
-            UnkShort6_0x14,
-            UnkShort7_0x16;
+        public float X { get; set; }
+        public float Y { get; set; }
+        public float Width { get; set; }
+        public float Height { get; set; }
+        public short UnkShort4_0x10 { get; set; }
+        public short UnkShort5_0x12 { get; set; }
+        public short UnkShort6_0x14 { get; set; }
+        public short UnkShort7_0x16 { get; set; }
 
         public PushboxCommand() { }
         public override void ReadCommandDataBlock(BinaryReader br, int startTick, int endTick)

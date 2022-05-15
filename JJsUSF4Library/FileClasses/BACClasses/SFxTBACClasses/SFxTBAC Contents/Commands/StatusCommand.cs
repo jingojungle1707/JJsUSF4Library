@@ -9,8 +9,8 @@ namespace JJsUSF4Library.FileClasses.BACClasses.SFxTBACClasses
 {
     public class StatusCommand : CommandBase
     {
-        public Status StatusFlags;
-        public int UnkLong1_0x04;
+        public Status StatusFlags { get; set; }
+        public int UnkLong1_0x04 { get; set; }
 
         [Flags]
         public enum Status
@@ -25,7 +25,7 @@ namespace JJsUSF4Library.FileClasses.BACClasses.SFxTBACClasses
             UNK0x0040 = 0x40, //PacMan HIT_BODY_UPPER
             UNK0x0080 = 0x80, //Always set when crouch?
 
-            UNK0x0100 = 0x0100,//Always set when airborne?
+            UNK0x0100 = 0x0100, //Always set when airborne?
             UNK0x0200 = 0x0200, //LEI.bac -> DRUNKSTANCE -> SUIHOTAI
             UNK0x0400 = 0x0400, //SC_L
             UNK0x0800 = 0x0800, //CA_FINISH, GUARD_CANCEL, PSYCHOCRUSHER
@@ -37,7 +37,7 @@ namespace JJsUSF4Library.FileClasses.BACClasses.SFxTBACClasses
 
             UNK0x010000 = 0x10000, //CROSS_ARTS, CROSS_ARTS_HIT
             TURN = 0x20000, //THROW_F_DAMAGE, THROW_B_DAMAGE
-            UNK0x040000 = 0x40000, //40,000 in RINGOUT_LOOP, CC_RINGOUT_START, TC_ATTACK, CROSS_ARTS_HIT, WARP, TC_5LP
+            CAN_TURN = 0x40000, //40,000 in RINGOUT_LOOP, CC_RINGOUT_START, TC_ATTACK, CROSS_ARTS_HIT, WARP, TC_5LP
             UNUSED0x080000 = 0x80000,
 
             UNK0x100000 = 0x100000, //RINGOUT_START, RINGIN_START, RINGIN_LOOP

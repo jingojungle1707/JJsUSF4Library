@@ -1,30 +1,48 @@
-﻿using System.Collections.Generic;
+﻿using System;
+using System.Collections.Generic;
 using System.IO;
 
 namespace JJsUSF4Library.FileClasses.BACClasses.SFxTBACClasses
 {
     public class SFxTScript
     {
-        #region Members
-        public string Name;
+        #region Properties
+        public string Name { get; set; }
         //0x00
-        public int
-            HitboxStart, //Short
-            HitboxEnd, //Short
-            IASA, //Short
-            End, //Short
-            UnkLong4_0x08; //Long
-        public float
-            XOffset;
+        public short HitboxStart { get; set; } //Short
+        public short HitboxEnd { get; set; } //Short
+        public short IASA { get; set; } //Short
+        public short End { get; set; } //Short
+        public PhysicsFlag PhysicsFlags { get; set; } //Short
+        public short UnkShort5_0x0A { get; set; } //Short
+        public float XOffset { get; set; }
         //0x10
-        public int
-            ScriptFlags, //Short
-            EndsOn_, //Short
-            Loop; //Long?
-
-        public List<ScriptSection> ScriptSections;
-
+        public short ScriptFlags { get; set; } //Short
+        public short EndsOn_ { get; set; } //Short
+        public int LoopToFrame { get; set; } //Long?
+        public List<ScriptSection> ScriptSections { get; set; } = new List<ScriptSection>();
         #endregion
+
+        [Flags]
+        public enum PhysicsFlag : ushort
+        {
+            UNK0x01 = 0x01,
+            RETAIN_X_VELOCITY = 0x02,
+            RETAIN_Y_VELOCITY = 0x04,
+            RETAIN_Z_VELOCITY = 0x08,
+            RETAIN_X_ACCELERATION = 0x10,
+            RETAIN_Y_ACCELERATION = 0x20,
+            RETAIN_Z_ACCELERATION = 0x40,
+            RETAIN_X_VELOCITY_2 = 0x80,
+            RETAIN_Y_VELOCITY_2 = 0x0100,
+            RETAIN_Z_VELOCITY_2 = 0x0200,
+            UNK0x0400 = 0x0400,
+            UNK0x0800 = 0x0800,
+            UNK0x1000 = 0x1000,
+            UNK0x2000 = 0x2000,
+            UNK0x4000 = 0x4000,
+            UNK0x8000 = 0x8000,
+        }
 
         #region Constructors
         public SFxTScript()
@@ -44,12 +62,13 @@ namespace JJsUSF4Library.FileClasses.BACClasses.SFxTBACClasses
             HitboxEnd = br.ReadInt16();
             IASA = br.ReadInt16();
             End = br.ReadInt16();
-            UnkLong4_0x08 = br.ReadInt32();
+            PhysicsFlags = (PhysicsFlag)br.ReadUInt16();
+            UnkShort5_0x0A = br.ReadInt16();
             XOffset = br.ReadSingle();
             //0x10
             ScriptFlags = br.ReadInt16();
             EndsOn_ = br.ReadInt16();
-            Loop = br.ReadInt32();
+            LoopToFrame = br.ReadInt32();
             int scriptSectionCount = br.ReadInt32();
             br.ReadInt32(); //script section pointer - always 0x20 so just skip it
             //0x20

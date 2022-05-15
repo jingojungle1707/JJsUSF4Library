@@ -9,29 +9,27 @@ namespace JJsUSF4Library.FileClasses.BACClasses.SFxTBACClasses
 {
     public class HurtboxCommand : CommandBase
     {
-        public float
-            X, Y, Width, Height;
-        public int
-            UnkShort4_0x10,
-            UnkShort5_0x12,
-            Flags, //Short
-            UnkShort7_0x16,
-            Counter; //Short
-        public byte
-            UnkByte9_0x1A,
-            UnkByte10_0x1B;
-        public Vulnerability VulFlags;
-        //public int Vul; //Short
-        public byte Armour;
-        public int UnkShort13_0x1F; //Short
-        public byte
-            UnkByte14_0x21,
-            UnkByte15_0x22,
-            UnkByte16_0x23,
-            UnkByte17_0x24,
-            UnkByte18_0x25;
-        public int UnkShort19_0x26;
-        public float UnkFloat20_0x28;
+        public float X { get; set; }
+        public float Y { get; set; }
+        public float Width { get; set; }
+        public float Height { get; set; }
+        public short UnkShort4_0x10 { get; set; }
+        public short UnkShort5_0x12 { get; set; }
+        public ushort Flags { get; set; } //Short 
+        public short UnkShort7_0x16 { get; set; }
+        public short Counter { get; set; } //Short
+        public byte UnkByte9_0x1A { get; set; }
+        public byte UnkByte10_0x1B { get; set; }
+        public Vulnerability VulFlags { get; set; }
+        public byte Armour { get; set; }
+        public short UnkShort13_0x1F { get; set; } //Short
+        public byte UnkByte14_0x21 { get; set; }
+        public byte UnkByte15_0x22 { get; set; }
+        public byte UnkByte16_0x23 { get; set; }
+        public byte UnkByte17_0x24 { get; set; }
+        public byte UnkByte18_0x25 { get; set; }
+        public short UnkShort19_0x26 { get; set; }
+        public float UnkFloat20_0x28 { get; set; }
 
         [Flags]
         public enum Vulnerability
@@ -66,7 +64,7 @@ namespace JJsUSF4Library.FileClasses.BACClasses.SFxTBACClasses
             Height = br.ReadSingle();
             UnkShort4_0x10 = br.ReadInt16();
             UnkShort5_0x12 = br.ReadInt16();
-            Flags = br.ReadInt16();
+            Flags = br.ReadUInt16();
             UnkShort7_0x16 = br.ReadInt16();
             Counter = br.ReadInt16();
             UnkByte9_0x1A = br.ReadByte();

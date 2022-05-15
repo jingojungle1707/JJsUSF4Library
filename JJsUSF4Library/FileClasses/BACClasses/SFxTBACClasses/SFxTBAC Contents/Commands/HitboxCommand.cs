@@ -4,42 +4,49 @@ using System.IO;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
+using System.Xml.Serialization;
 
 namespace JJsUSF4Library.FileClasses.BACClasses.SFxTBACClasses
 {
     public class HitboxCommand : CommandBase
     {
-        public float
-            X, Y, Width, Height;
+        public float X { get; set; }
+        public float Y { get; set; }
+        public float Width { get; set; }
+        public float Height { get; set; }
         //0x10
-        public int
-            UnkShort4_0x10,
-            UnkShort5_0x12;
-        public HitFlags HitFlag;
-        public int
-            UnkShort6_0x16;
-        public byte
-            ID,
-            Properties,
-            UnkByte9_0x1A,
-            HitLevel;
-        public HitboxType Type;
-        public byte
-            Juggle,
-            JuggleAdd,
-            UnkByte14_0x1F,
-            //0x20
-            UnkByte15_0x20,
-            UnkByte16_0x21,
-            UnkByte17_0x22,
-            UnkByte18_0x23;
-        public int HitEffect; //short
-        public byte
-            UnkByte20_0x26,
-            UnkByte21_0x27;
-        public float
-            UnkFloat22_0x28,
-            UnkFloat23_0x2C;
+        public short UnkShort4_0x10 { get; set; }
+        public short UnkShort5_0x12 { get; set; }
+        public HitFlags HitFlag { get; set; }
+        public short UnkShort6_0x16 { get; set; }
+
+        [XmlElement("ID_SByte")]
+        public sbyte ID { get; set; }
+        [XmlElement("Properties_SByte")]
+        public sbyte Properties { get; set; }
+        [XmlElement("NumberofHits_SByte")]
+        public sbyte NumberOfHits { get; set; }
+        [XmlElement("HitLevel_SByte")]
+        public sbyte HitLevel { get; set; }
+        public HitboxType Type { get; set; }
+        [XmlElement("Juggle_SByte")]
+        public sbyte Juggle { get; set; }
+        [XmlElement("JuggleAdd_SByte")]
+        public sbyte JuggleAdd { get; set; }
+        public sbyte UnkByte14_0x1F { get; set; }
+        //0x20
+        public sbyte UnkByte15_0x20 { get; set; }
+        public sbyte UnkByte16_0x21 { get; set; }
+        [XmlElement("DamageMultiplier_SByte")]
+        public sbyte DamageMultiplier { get; set; }
+        [XmlElement("RecoverablePercentage_SByte")]
+        public sbyte RecoverablePercentage { get; set; }
+        [XmlElement("HitEffect_Short")] //TODO check - short? ushort?
+        public short HitEffect { get; set; }
+        public sbyte UnkByte20_0x26 { get; set; }
+        public sbyte UnkByte21_0x27 { get; set; }
+        public float UnkFloat22_0x28 { get; set; }
+        public float UnkFloat23_0x2C { get; set; }
 
         public enum HitboxType
         {
@@ -67,8 +74,8 @@ namespace JJsUSF4Library.FileClasses.BACClasses.SFxTBACClasses
             UNBLOCKABLE = 0x80,
             BREAK_ARMOR = 0x100,
             BREAK_COUNTER = 0x200,
-            UNK0x0400 = 0x400,
-            UNK0x0800 = 0x800,
+            DONT_HIT_WEAPON = 0x400,
+            DONT_HIT_NO_WEAPON = 0x800,
             UNK0x1000 = 0x1000,
             UNK0x2000 = 0x2000,
             UNK0x4000 = 0x4000,
@@ -99,21 +106,21 @@ namespace JJsUSF4Library.FileClasses.BACClasses.SFxTBACClasses
             {
 
             }
-            ID = br.ReadByte();
-            Properties = br.ReadByte();
-            UnkByte9_0x1A = br.ReadByte();
-            HitLevel = br.ReadByte();
+            ID = br.ReadSByte();
+            Properties = br.ReadSByte();
+            NumberOfHits = br.ReadSByte();
+            HitLevel = br.ReadSByte();
             Type = (HitboxType)br.ReadByte();
-            Juggle = br.ReadByte();
-            JuggleAdd = br.ReadByte();
-            UnkByte14_0x1F = br.ReadByte();
-            UnkByte15_0x20 = br.ReadByte();
-            UnkByte16_0x21 = br.ReadByte();
-            UnkByte17_0x22 = br.ReadByte();
-            UnkByte18_0x23 = br.ReadByte();
+            Juggle = br.ReadSByte();
+            JuggleAdd = br.ReadSByte();
+            UnkByte14_0x1F = br.ReadSByte();
+            UnkByte15_0x20 = br.ReadSByte();
+            UnkByte16_0x21 = br.ReadSByte();
+            DamageMultiplier = br.ReadSByte();
+            RecoverablePercentage = br.ReadSByte();
             HitEffect = br.ReadInt16();
-            UnkByte20_0x26 = br.ReadByte();
-            UnkByte21_0x27 = br.ReadByte();
+            UnkByte20_0x26 = br.ReadSByte();
+            UnkByte21_0x27 = br.ReadSByte();
             UnkFloat22_0x28 = br.ReadSingle();
             UnkFloat23_0x2C = br.ReadSingle();
         }
@@ -130,21 +137,21 @@ namespace JJsUSF4Library.FileClasses.BACClasses.SFxTBACClasses
             USF4Utils.AddIntAsBytes(Data, (int)HitFlag, false);
             USF4Utils.AddIntAsBytes(Data, UnkShort6_0x16, false);
             //USF4Utils.AddIntAsBytes(Data, UnkLong6_0x14, true);
-            Data.Add(ID);
-            Data.Add(Properties);
-            Data.Add(UnkByte9_0x1A);
-            Data.Add(HitLevel);
+            Data.Add((byte)ID);
+            Data.Add((byte)Properties);
+            Data.Add((byte)NumberOfHits);
+            Data.Add((byte)HitLevel);
             Data.Add((byte)Type);
-            Data.Add(Juggle);
-            Data.Add(JuggleAdd);
-            Data.Add(UnkByte14_0x1F);
-            Data.Add(UnkByte15_0x20);
-            Data.Add(UnkByte16_0x21);
-            Data.Add(UnkByte17_0x22);
-            Data.Add(UnkByte18_0x23);
+            Data.Add((byte)Juggle);
+            Data.Add((byte)JuggleAdd);
+            Data.Add((byte)UnkByte14_0x1F);
+            Data.Add((byte)UnkByte15_0x20);
+            Data.Add((byte)UnkByte16_0x21);
+            Data.Add((byte)DamageMultiplier);
+            Data.Add((byte)RecoverablePercentage);
             USF4Utils.AddIntAsBytes(Data, HitEffect, false);
-            Data.Add(UnkByte20_0x26);
-            Data.Add(UnkByte21_0x27);
+            Data.Add((byte)UnkByte20_0x26);
+            Data.Add((byte)UnkByte21_0x27);
             USF4Utils.AddFloatAsBytes(Data, UnkFloat22_0x28);
             USF4Utils.AddFloatAsBytes(Data, UnkFloat23_0x2C);
 

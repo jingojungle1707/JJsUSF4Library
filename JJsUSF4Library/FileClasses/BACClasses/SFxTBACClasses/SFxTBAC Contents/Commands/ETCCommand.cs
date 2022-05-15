@@ -9,8 +9,8 @@ namespace JJsUSF4Library.FileClasses.BACClasses.SFxTBACClasses
 {
     public class ETCCommand : CommandHasParamsBase
     {
-        public byte Type;
-        public int UnkShort1_0x01;
+        public byte Type { get; set; }
+        public short UnkShort1_0x01 { get; set; }
 
         public ETCCommand() { }
         public override void ReadCommandDataBlock(BinaryReader br, int startTick, int endTick)

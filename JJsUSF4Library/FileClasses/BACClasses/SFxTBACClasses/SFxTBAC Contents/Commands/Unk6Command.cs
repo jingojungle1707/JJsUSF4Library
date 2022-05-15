@@ -9,8 +9,8 @@ namespace JJsUSF4Library.FileClasses.BACClasses.SFxTBACClasses
 {
     public class Unk6Command : CommandHasParamsBase
     {
-        public byte UnkByte0_0x00;
-        public int UnkShort1_0x01;
+        public byte UnkByte0_0x00 { get; set; }
+        public short UnkShort1_0x01 { get; set; }
 
         public Unk6Command() { }
         public override void ReadCommandDataBlock(BinaryReader br, int startTick, int endTick)
