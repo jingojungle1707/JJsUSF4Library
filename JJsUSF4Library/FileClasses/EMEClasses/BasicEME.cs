@@ -91,7 +91,8 @@ namespace JJsUSF4Library.FileClasses.EMEClasses
                 throw new ArgumentOutOfRangeException();
             }
 
-            byte[] item = OffsetByteArrayPairs[itemIndex];
+            int key = OffsetByteArrayPairs.Keys.ToList()[itemIndex];
+            byte[] item = OffsetByteArrayPairs[key];
 
             if (item[0x03] == 2)
             {
@@ -109,7 +110,8 @@ namespace JJsUSF4Library.FileClasses.EMEClasses
 
         public void SetItemTextureIndex(int itemIndex, sbyte newIndex)
         {
-            var item = OffsetByteArrayPairs[itemIndex];
+            int key = OffsetByteArrayPairs.Keys.ToList()[itemIndex];
+            byte[] item = OffsetByteArrayPairs[key];
 
             if (item[0x03] == 2)
             {
@@ -120,7 +122,7 @@ namespace JJsUSF4Library.FileClasses.EMEClasses
                 else if (item[0x02] == 3) textureIndexPosition = 0x8C; //AGL SHmr_GShock.ep.eme
                 else throw new ArgumentException("Unrecognised value at 0x02!");
 
-                OffsetByteArrayPairs[itemIndex][textureIndexPosition] = (byte)newIndex;
+                OffsetByteArrayPairs[key][textureIndexPosition] = (byte)newIndex;
             }
         }
 

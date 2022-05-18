@@ -16,6 +16,20 @@ namespace JJsUSF4Library.FileClasses.BVSClasses
         public byte Index2 { get; set; }
         public byte Index1 { get; set; }
         public byte Index0 { get; set; }
+        public (int, int, int, int) ResourcePath
+        {
+            get 
+            {
+                return ((int)Type, Index0, Index1, Index2);
+            }
+            set
+            {
+                Type = (ResourceType)value.Item1;
+                Index0 = (byte)value.Item2;
+                Index1 = (byte)value.Item3;
+                Index2 = (byte)value.Item4;
+            }
+        }
 
         //Byte at 0x23 stores both of sourcefile and resourcetype.
         //byte && 0x03 == ResourceType
