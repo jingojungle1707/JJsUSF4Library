@@ -22,25 +22,33 @@ namespace JJsUSF4Library.FileClasses.BACClasses.SFxTBACClasses
 
         [XmlElement("ID_SByte")]
         public sbyte ID { get; set; }
+
         [XmlElement("Properties_SByte")]
         public sbyte Properties { get; set; }
+
         [XmlElement("NumberofHits_SByte")]
         public sbyte NumberOfHits { get; set; }
+
         [XmlElement("HitLevel_SByte")]
         public sbyte HitLevel { get; set; }
         public HitboxType Type { get; set; }
+
         [XmlElement("Juggle_SByte")]
         public sbyte Juggle { get; set; }
+
         [XmlElement("JuggleAdd_SByte")]
         public sbyte JuggleAdd { get; set; }
-        public sbyte UnkByte14_0x1F { get; set; }
+        public sbyte JuggleStart_SByte { get; set; }
         //0x20
         public sbyte UnkByte15_0x20 { get; set; }
         public sbyte UnkByte16_0x21 { get; set; }
+
         [XmlElement("DamageMultiplier_SByte")]
         public sbyte DamageMultiplier { get; set; }
+
         [XmlElement("RecoverablePercentage_SByte")]
         public sbyte RecoverablePercentage { get; set; }
+
         [XmlElement("HitEffect_Short")] //TODO check - short? ushort?
         public short HitEffect { get; set; }
         public sbyte UnkByte20_0x26 { get; set; }
@@ -113,7 +121,7 @@ namespace JJsUSF4Library.FileClasses.BACClasses.SFxTBACClasses
             Type = (HitboxType)br.ReadByte();
             Juggle = br.ReadSByte();
             JuggleAdd = br.ReadSByte();
-            UnkByte14_0x1F = br.ReadSByte();
+            JuggleStart_SByte = br.ReadSByte();
             UnkByte15_0x20 = br.ReadSByte();
             UnkByte16_0x21 = br.ReadSByte();
             DamageMultiplier = br.ReadSByte();
@@ -144,7 +152,7 @@ namespace JJsUSF4Library.FileClasses.BACClasses.SFxTBACClasses
             Data.Add((byte)Type);
             Data.Add((byte)Juggle);
             Data.Add((byte)JuggleAdd);
-            Data.Add((byte)UnkByte14_0x1F);
+            Data.Add((byte)JuggleStart_SByte);
             Data.Add((byte)UnkByte15_0x20);
             Data.Add((byte)UnkByte16_0x21);
             Data.Add((byte)DamageMultiplier);

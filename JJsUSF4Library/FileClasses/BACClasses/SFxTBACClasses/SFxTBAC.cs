@@ -214,7 +214,7 @@ namespace JJsUSF4Library.FileClasses.BACClasses.SFxTBACClasses
                 }
                 for (int j = 0; j < sf.Scripts.Count; j++)
                 {
-                    if (sf.Scripts[j].ScriptSections == null)
+                    if (sf.Scripts[j].ScriptSections.Count == 0)
                     {
                         USF4Utils.UpdateIntAtPosition(data, scriptPointerPositions[j], 0x00);
                         continue;

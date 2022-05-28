@@ -82,23 +82,23 @@ namespace JJsUSF4Library.FileClasses.BACClasses.SFxTBACClasses
         {
             List<byte> Data = new List<byte>();
 
-            List<int> CommandHeaderPointerPositions = new List<int>();
-            List<int> CommandDataPointerPositions = new List<int>();
+            List<int> commandHeaderPointerPositions = new List<int>();
+            List<int> commandDataPointerPositions = new List<int>();
             for (int i = 0; i < ScriptSections.Count; i++)
             {
                 ScriptSection ss = ScriptSections[i];
                 Data.Add((byte)ss.Type);
                 Data.Add(ss.UnkByte1_0x01);
                 USF4Utils.AddIntAsBytes(Data, ss.Commands.Count, false);
-                CommandHeaderPointerPositions.Add(Data.Count);
+                commandHeaderPointerPositions.Add(Data.Count);
                 USF4Utils.AddIntAsBytes(Data, -1, true);
-                CommandDataPointerPositions.Add(Data.Count);
+                commandDataPointerPositions.Add(Data.Count);
                 USF4Utils.AddIntAsBytes(Data, -1, true);
             }
             for (int i = 0; i < ScriptSections.Count; i++)
             {
                 //Adjust by - i * 0x0C to account for pointers counting from header positions
-                USF4Utils.UpdateIntAtPosition(Data, CommandHeaderPointerPositions[i], Data.Count - i * 0x0c);
+                USF4Utils.UpdateIntAtPosition(Data, commandHeaderPointerPositions[i], Data.Count - i * 0x0c);
                 ScriptSection ss = ScriptSections[i];
 
                 for (int j = 0; j < ss.Commands.Count; j++)
@@ -107,7 +107,7 @@ namespace JJsUSF4Library.FileClasses.BACClasses.SFxTBACClasses
                     USF4Utils.AddIntAsBytes(Data, ss.Commands[j].EndTick, false);
                 }
 
-                USF4Utils.UpdateIntAtPosition(Data, CommandDataPointerPositions[i], Data.Count - i * 0x0c);
+                USF4Utils.UpdateIntAtPosition(Data, commandDataPointerPositions[i], Data.Count - i * 0x0c);
                 Data.AddRange(ss.GenerateScriptSectionBytes());
             }
             return Data.ToArray();

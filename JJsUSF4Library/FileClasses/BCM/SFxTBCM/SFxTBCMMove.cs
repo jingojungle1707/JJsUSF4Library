@@ -56,8 +56,8 @@ namespace JJsUSF4Library.FileClasses.ScriptClasses
         public enum PositionRestrictions
         {
             NONE = 0x00,
-            CLOSE = 0x01,
-            FAR = 0x02,
+            FAR = 0x01,
+            CLOSE = 0x02,
             HIGH = 0x03
         }
         [Flags]
