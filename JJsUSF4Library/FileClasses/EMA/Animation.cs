@@ -146,19 +146,20 @@ namespace JJsUSF4Library.FileClasses.SubfileClasses
             MysteryFlag0x08 = br.ReadInt32();
             int namePointer = br.ReadInt32();
             int valuesListPointer = br.ReadInt32();
+            int valueSizeFlag = MysteryFlag0x08;
 
             //Read values first so they're available when we read CMD tracks
             ValuesList = new List<float>();
             br.BaseStream.Seek(offset + valuesListPointer, SeekOrigin.Begin);
             for (int i = 0; i < valueCount; i++)
             {
-                //TODO valueSizeFlag turned out to be wrong, still need to figure out how the game knows to read Halfs or Singles
-                //if (valueSizeFlag != 0)
-                //{
-                //    ValuesList.Add(USF4Utils.ReadShortFloat(br.ReadBytes(2)));
-                //}
-                //else ValuesList.Add(br.ReadSingle());
-                ValuesList.Add(br.ReadSingle());
+                //The game doesn't seem to care what this is set to, but it DOES appear to be a correct marker for half-floats in existing .ema files...?
+                if (valueSizeFlag != 0)
+                {
+                    ValuesList.Add(USF4Utils.ReadShortFloat(br.ReadBytes(2)));
+                }
+                else ValuesList.Add(br.ReadSingle());
+                //ValuesList.Add(br.ReadSingle());
             }
 
             //Reading CMDtracks with from stream seems to be extremely slow. (Lots of jumping around?)
