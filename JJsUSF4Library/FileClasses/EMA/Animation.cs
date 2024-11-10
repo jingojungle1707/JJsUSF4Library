@@ -159,7 +159,6 @@ namespace JJsUSF4Library.FileClasses.SubfileClasses
                     ValuesList.Add(USF4Utils.ReadShortFloat(br.ReadBytes(2)));
                 }
                 else ValuesList.Add(br.ReadSingle());
-                //ValuesList.Add(br.ReadSingle());
             }
 
             //Reading CMDtracks with from stream seems to be extremely slow. (Lots of jumping around?)
