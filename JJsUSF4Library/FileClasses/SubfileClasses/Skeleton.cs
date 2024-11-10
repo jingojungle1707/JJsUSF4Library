@@ -29,6 +29,11 @@ namespace JJsUSF4Library.FileClasses.SubfileClasses
             get { return IKNodes.Select(o => o.Name).ToList(); }
         }
 
+        public Node NodeByName(string nodeName)
+        {
+            return Nodes.Where(x => x.Name == nodeName).FirstOrDefault();
+        }
+
         public SkeletonType Type;
 
         public enum SkeletonType

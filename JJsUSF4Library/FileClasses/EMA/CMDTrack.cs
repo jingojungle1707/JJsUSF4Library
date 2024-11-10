@@ -11,6 +11,7 @@ namespace JJsUSF4Library.FileClasses.SubfileClasses
         public byte TransformType;
         public byte BitFlag;
         private List<Step> _steps = new List<Step>();
+        public Skeleton Skeleton { get; private set; } = new Skeleton();
 
         [Flags]
         public enum CMDBitFlag
@@ -32,7 +33,7 @@ namespace JJsUSF4Library.FileClasses.SubfileClasses
         public class Step
         {
             //Nullable tangent so we can differentiate between 0f and "no tangent"
-            private float? _tangent;
+            private float? _tangent = null;
             public int Frame { get; set; }
             public float Value { get; set; }
             public float Tangent 
