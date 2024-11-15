@@ -156,7 +156,8 @@ namespace JJsUSF4Library
         {
             //Declare default
             float value = 0;
-
+            float frameMax = c.Steps.Select(x=>x.Frame).Max();
+            frame = Math.Min(frameMax, frame);
             for (int i = 0; i < c.Steps.Count; i++)
             {
                 if (c.Steps[i].Frame > frame)

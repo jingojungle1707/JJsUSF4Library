@@ -95,6 +95,48 @@ namespace JJsUSF4Library
             }
         }
 
+        public static List<int[]> FaceIndicesFromDaisyChain(int[] DaisyChain, bool readmode = false)
+        {
+            List<int[]> FaceIndices = new List<int[]>();
+
+            if (readmode == true && DaisyChain.Length % 3 == 0)
+            {
+                for (int i = 0; i < DaisyChain.Length / 3; i++)
+                {
+                    FaceIndices.Add(new int[] { DaisyChain[3 * i + 2], DaisyChain[3 * i + 1], DaisyChain[3 * i] });
+                }
+            }
+            else
+            {
+                bool bForwards = true;
+                for (int i = 0; i < DaisyChain.Length - 2; i++)
+                {
+                    if (bForwards) //This seems to be backwards?? But it works.
+                    {
+                        int[] temp = new int[] { DaisyChain[i + 2], DaisyChain[i + 1], DaisyChain[i] };
+
+                        if (temp[0] != temp[1] && temp[1] != temp[2] && temp[2] != temp[0])
+                        {
+                            FaceIndices.Add(temp);
+                        }
+                    }
+                    else
+                    {
+                        int[] temp = new int[] { DaisyChain[i], DaisyChain[i + 1], DaisyChain[i + 2] };
+
+                        if (temp[0] != temp[1] && temp[1] != temp[2] && temp[2] != temp[0])
+                        {
+                            FaceIndices.Add(temp);
+                        }
+                    }
+
+                    bForwards = !bForwards;
+                }
+            }
+
+            return FaceIndices;
+        }
+
         #region Binary Methods
         public static void WriteDataToStream(string FilePath, byte[] Data)
         {

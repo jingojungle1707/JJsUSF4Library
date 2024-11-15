@@ -56,7 +56,7 @@ namespace JJsUSF4Library.FileClasses.SubfileClasses
                 byte[] ids = br.ReadBytes(4);
                 List<float> weights = new List<float>() { br.ReadSingle(), br.ReadSingle(), br.ReadSingle() };
                 //Fill in weight 4
-                if (weights.Sum() < 1f) weights.Add((float)Math.Round(1f - weights.Sum(),6));
+                if (weights.Sum() < 1f) weights.Add((float)Math.Round(1f - weights.Sum(), 6));
                 else weights.Add(0);
 
                 for (int i = 0; i < 4; i++) BoneIDWeightPairs.Add(new BoneIDWeightPair(ids[i], weights[i]));
@@ -67,7 +67,7 @@ namespace JJsUSF4Library.FileClasses.SubfileClasses
         {
             List<byte> Data = new List<byte>();
 
-            if ((bitFlag & 0x01) == 0x01) 
+            if ((bitFlag & 0x01) == 0x01)
             {
                 USF4Utils.AddFloatAsBytes(Data, Position.X);
                 USF4Utils.AddFloatAsBytes(Data, Position.Y);
@@ -179,25 +179,28 @@ namespace JJsUSF4Library.FileClasses.SubfileClasses
             {
                 get { return _mapped; }
             }
+            public void SetMapping(string boneName, int skeletonBoneId)
+            {
+                _boneName = boneName;
+                _boneID = skeletonBoneId;
+                _mapped = true;
+            }
             /// <summary>
             /// Assigning a string to BoneName completes the mapping the sets Mapped to true.
             /// </summary>
             public string BoneName
             {
                 get { return _boneName; }
-                set
-                {
-                    _boneName = value;
-                    _mapped = true;
-                }
+                private set { _boneName = BoneName; }
             }
             /// <summary>
             /// Constructs a completed mapping. Sets Mapped to true.
             /// </summary>
-            public BoneIDWeightPair(string boneName, float weight)
+            public BoneIDWeightPair(string boneName, float weight, int boneId = -1)
             {
                 BoneName = boneName;
                 Weight = weight;
+                _boneID = boneId;
                 _mapped = true;
             }
             /// <summary>

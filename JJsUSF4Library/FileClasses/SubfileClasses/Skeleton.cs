@@ -234,6 +234,12 @@ namespace JJsUSF4Library.FileClasses.SubfileClasses
                         USF4Utils.AddFloatAsBytes(data, IKDataBlocks[i].IKFloats[j]);
                     }
                 }
+            }
+
+            if (IKNodes.Count > 0)
+            {
+
+
                 //IK Bone Lists Index
                 USF4Utils.UpdateIntAtPosition(data, iKBoneListPointerPosition, data.Count);
                 List<int> iKNodeBoneListPointerPositions = new List<int>();

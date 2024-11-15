@@ -17,7 +17,7 @@ namespace JJsUSF4Library.FileClasses.SubfileClasses
         public List<Vector4> CullData;
 
         public Model()
-        { 
+        {
         }
         public Model(BinaryReader br, int offset = 0, List<string> boneNames = default(List<string>))
         {
@@ -84,7 +84,7 @@ namespace JJsUSF4Library.FileClasses.SubfileClasses
                                 //    break;
                                 //}
 
-                                v.BoneIDWeightPairs[j].BoneName = boneNames[sm.BoneIntegersList[v.BoneIDWeightPairs[j].BoneID]];
+                                v.BoneIDWeightPairs[j].SetMapping(boneNames[sm.BoneIntegersList[v.BoneIDWeightPairs[j].BoneID]], sm.BoneIntegersList[v.BoneIDWeightPairs[j].BoneID]);
                             }
                             break;
                         }
@@ -245,11 +245,11 @@ namespace JJsUSF4Library.FileClasses.SubfileClasses
         {
             List<string>[] boneMaps = new List<string>[SubModels.Count];
             for (int j = 0; j < SubModels.Count; j++) boneMaps[j] = new List<string>();
-            
+
             for (int i = 0; i < VertexData.Count; i++)
             {
                 Vertex v = VertexData[i];
-                
+
                 for (int j = 0; j < SubModels.Count; j++)
                 {
                     if (SubModels[j].DaisyChain.Contains(i))

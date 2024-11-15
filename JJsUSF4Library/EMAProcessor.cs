@@ -1,6 +1,7 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Diagnostics;
+using System.Dynamic;
 using System.Linq;
 using System.Numerics;
 using System.Text;
@@ -13,26 +14,46 @@ namespace JJsUSF4Library
 {
     public class EMAProcessor
     {
-        public static float CurrentFrame { get; private set; }
-        public static int CurrentAnimationIndex { get; private set; }
-        public static EMA Ema { get; private set; }
-        public static EMO Emo { get; private set; }
-        public static AnimatedSkeleton AnimatedSkeleton { get; private set; }
-        public static AnimatedNode[] AnimatedNodes { get; private set; }
-        public static string CurrentAnimationName
+        public float CurrentFrame { get; private set; }
+        public int CurrentAnimationIndex { get; private set; }
+        public int CurrentFaceIndex { get; private set; }
+        public EMA Ema { get; private set; }
+        public EMA FaceEma { get; private set; }
+        public EMO Emo { get; private set; }
+        public AnimatedSkeleton AnimatedSkeleton { get; private set; }
+        public AnimatedNode[] AnimatedNodes { get; private set; }
+        public string CurrentAnimationName
         {
             get { return Ema.Animations[CurrentAnimationIndex].Name; }
         }
-        
+        //private List<CMDTrack> _currentTracks = new List<CMDTrack>();
 
-        public EMAProcessor(EMA animatedEma, EMO skinnedEmo)
+
+        public EMAProcessor(EMA animatedEma, EMA faceEma, EMO skinnedEmo = default)
         {
+            FaceEma = new EMA();
             CurrentFrame = 0;
+            CurrentAnimationIndex = 0;
+            CurrentFaceIndex = 0;
+
+            //Deep copy of faceEma
+            FaceEma.ReadFromStream(new System.IO.BinaryReader(new System.IO.MemoryStream(faceEma.GenerateBytes())));
             Ema = animatedEma;
             Emo = skinnedEmo;
+
+            //Retarget face command tracks
+            foreach (Animation a in FaceEma.Animations)
+            {
+                foreach (CMDTrack c in a.CMDTracks)
+                {
+                    c.BoneID = Ema.Skeleton.NodeNames.IndexOf(FaceEma.Skeleton.NodeNames[c.BoneID]);
+                }
+            }
+
             AnimatedSkeleton = new AnimatedSkeleton(Ema.Skeleton);
             AnimatedNodes = AnimatedSkeleton.AnimatedNodes.ToArray();
             SetupRestPose();
+            SetupAnimation(0);
         }
 
         public AnimatedNode[] ReturnAnimatedNodes()
@@ -43,7 +64,7 @@ namespace JJsUSF4Library
         private void SetupRestPose()
         {
             //Overwrite rest pose with the _emo rest pose
-            foreach (Node n in AnimatedSkeleton.Nodes)
+            foreach (Node n in AnimatedSkeleton.AnimatedNodes)
             {
                 int index = Emo.Skeleton.NodeNames.IndexOf(n.Name);
                 switch (n.Name)
@@ -82,7 +103,7 @@ namespace JJsUSF4Library
             return true;
         }
 
-        public static void AnimateFrame(float frame)
+        public void AnimateFrame(float frame)
         {
             //Lock the frame within the duration
             CurrentFrame = frame % Ema.Animations[CurrentAnimationIndex].Duration;
@@ -101,7 +122,7 @@ namespace JJsUSF4Library
 
         }
 
-        static void SetupFrame(float frame)
+        public void SetupFrame(float frame)
         {
             //Reset all the nodes, and calculate their transforms
             for (int i = 0; i < AnimatedNodes.Length; i++)
@@ -143,14 +164,20 @@ namespace JJsUSF4Library
             }
         }
 
-        private static bool getTransform(int anim_index, float frame, int bone_index, int transform_type, out Vector3 values, out bool absolute)
+        private bool getTransform(int anim_index, float frame, int bone_index, int transform_type, out Vector3 values, out bool absolute)
         {
             bool animated = false;
             absolute = false;
 
             values = new Vector3(0, 0, 0);
 
-            foreach (CMDTrack c in Ema.Animations[anim_index].CMDTracks.Where(x => x.BoneID == bone_index && x.TransformType == transform_type))
+            int coreTracks = Ema.Animations[CurrentAnimationIndex].CMDTracks.Count;
+
+            List<CMDTrack> tracks = Ema.Animations[CurrentAnimationIndex].CMDTracks.Select(x => x).ToList();
+            tracks.AddRange(FaceEma.Animations[0].CMDTracks);
+            //_currentTracks = tracks;
+
+            foreach (CMDTrack c in tracks.Where(x => x.BoneID == bone_index && x.TransformType == transform_type))
             {
                 int axis = c.BitFlag & 0x03;
 
@@ -178,7 +205,7 @@ namespace JJsUSF4Library
             return animated;
         }
 
-        static bool UpdateNode(AnimatedNode node, bool bForce = false, bool bUpdateChildren = false, bool bUpdateSiblings = false)
+        private bool UpdateNode(AnimatedNode node, bool bForce = false, bool bUpdateChildren = false, bool bUpdateSiblings = false)
         {
             //TODO check for IK-animated nodes and skip 'em
             if (bForce && !node.IKanimatedNode)
@@ -416,12 +443,12 @@ namespace JJsUSF4Library
             return pM_ECX;
         }
 
-        static void ProcessIKData0x00_00(IKDataBlock ik)
+        private void ProcessIKData0x00_00(IKDataBlock ik)
         {
 
         }
 
-        static void ProcessIKData0x00_02(IKDataBlock ik)
+        private void ProcessIKData0x00_02(IKDataBlock ik)
         {
 
             AnimatedNode node0 = AnimatedNodes[ik.BoneIDs[0]];
@@ -666,7 +693,7 @@ namespace JJsUSF4Library
             }
         }
 
-        static void ProcessIKData0x01_00(IKDataBlock ik)
+        private void ProcessIKData0x01_00(IKDataBlock ik)
         {
             // sub_525270
             {
@@ -738,17 +765,6 @@ namespace JJsUSF4Library
                 AnimatedNodes[node0.ID].animatedAbsoluteRotationFlag = true;
                 AnimatedNodes[node0.ID].animatedAbsoluteTranslationFlag = true;
                 AnimatedNodes[node0.ID].animatedAbsoluteScaleFlag = true;
-                //node0.animatedRotation = eulerAngles;
-
-                //node0.AnimatedScale = scale;
-                //node0.AnimatedTranslation = translation;
-                //node0.animatedRotationQuaternion = rotation;
-                //node0.AnimatedMatrix = matrix;
-
-                //node0.AnimationProcessingDone = true;
-                //node0.animatedAbsoluteRotationFlag = true;
-                //node0.animatedAbsoluteTranslationFlag = true;
-                //node0.animatedAbsoluteScaleFlag = true;
 
                 if (node0.Parent != string.Empty)
                 {
@@ -756,11 +772,25 @@ namespace JJsUSF4Library
                     node0.animatedLocalMatrix = matrix * parentInverseMatrix;
                 }
 
-                //updateNode(node0.ID, false, true, false);
+                int node0Child = Ema.Skeleton.NodeNames.IndexOf(node0.Child1);
+                if (node0Child >= 0 && node0Child < AnimatedNodes.Count())
+                {
+                    UpdateNode(AnimatedNodes[node0Child], true, true, true);
+                }
+                //int node1Child = Ema.Skeleton.NodeNames.IndexOf(node1.Child1);
+                //if (node1Child >= 0 && node1Child < AnimatedNodes.Count())
+                //{
+                //    UpdateNode(AnimatedNodes[Ema.Skeleton.NodeNames.IndexOf(node1.Child1)], true, true, true);
+                //}
+                //int node2Child = Ema.Skeleton.NodeNames.IndexOf(node2.Child1);
+                //if (node2Child >= 0 && node2Child < AnimatedNodes.Count())
+                //{
+                //    UpdateNode(AnimatedNodes[Ema.Skeleton.NodeNames.IndexOf(node2.Child1)], true, true, true);
+                //}
             }
         }
 
-        static bool updateIKData(int ikNumber)
+        private bool updateIKData(int ikNumber)
         {
             bool bResult = false;
 
@@ -777,6 +807,7 @@ namespace JJsUSF4Library
                             case 0x00:
                                 {
                                     ProcessIKData0x00_00(ik);
+                                    Debug.Print("Attempted to process 0x00_00 data");
                                 }
                                 break;
                             case 0x02:
