@@ -7,7 +7,7 @@ using System.Threading.Tasks;
 
 namespace JJsUSF4Library.FileClasses.SubfileClasses
 {
-    public class AnimatedNode : Node
+    public class AnimatedNode : Node, IAnimatedNode
     {
         public int ID { get; set; }
         public Vector3 Translation { get; set; }
@@ -18,17 +18,17 @@ namespace JJsUSF4Library.FileClasses.SubfileClasses
         public bool AnimationProcessingDone { get; set; }
         public bool IKanimatedNode { get; set; }
 
-        public bool animatedAbsoluteRotationFlag { get; set; }
-        public bool animatedAbsoluteScaleFlag { get; set; }
-        public bool animatedAbsoluteTranslationFlag { get; set; }
+        public bool AnimatedAbsoluteRotationFlag { get; set; }
+        public bool AnimatedAbsoluteScaleFlag { get; set; }
+        public bool AnimatedAbsoluteTranslationFlag { get; set; }
 
 
         public Matrix4x4 AnimatedMatrix { get; set; }
-        public Matrix4x4 animatedLocalMatrix { get; set; }
+        public Matrix4x4 AnimatedLocalMatrix { get; set; }
         public Vector3 AnimatedTranslation { get; set; }
-        public Vector3 animatedRotation { get; set; } //RADIANS
+        public Vector3 AnimatedRotation { get; set; } //RADIANS
         public Vector3 AnimatedScale { get; set; }
-        public Quaternion animatedRotationQuaternion { get; set; }
+        public Quaternion AnimatedRotationQuaternion { get; set; }
         public AnimatedNode()
         {
 
@@ -48,9 +48,9 @@ namespace JJsUSF4Library.FileClasses.SubfileClasses
             AnimationProcessingDone = false;
             IKanimatedNode = false;
 
-            animatedAbsoluteRotationFlag = false;
-            animatedAbsoluteScaleFlag = false;
-            animatedAbsoluteTranslationFlag = false;
+            AnimatedAbsoluteRotationFlag = false;
+            AnimatedAbsoluteScaleFlag = false;
+            AnimatedAbsoluteTranslationFlag = false;
 
             Matrix4x4.Decompose(TransformMatrix, out Vector3 scale, out Quaternion rotationQuaternion, out Vector3 translation);
             Scale = scale;
@@ -61,9 +61,9 @@ namespace JJsUSF4Library.FileClasses.SubfileClasses
             Rotation = rotation;
 
             AnimatedTranslation = Translation;
-            animatedRotation = Rotation;
+            AnimatedRotation = Rotation;
             AnimatedScale = Scale;
-            animatedRotationQuaternion = RotationQuaternion;
+            AnimatedRotationQuaternion = RotationQuaternion;
         }
 
     }

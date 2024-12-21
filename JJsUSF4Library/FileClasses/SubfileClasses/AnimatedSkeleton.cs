@@ -16,6 +16,10 @@ namespace JJsUSF4Library.FileClasses.SubfileClasses
                 return AnimatedNodes.Select(x => x.Name).ToList();
             }
         }
+        public AnimatedSkeleton()
+        {
+
+        }
         public AnimatedSkeleton(Skeleton skeleton)
         {
             AnimatedNodes = new List<AnimatedNode>();

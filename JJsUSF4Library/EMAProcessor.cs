@@ -12,10 +12,30 @@ using JJsUSF4Library.FileClasses.SubfileClasses;
 
 namespace JJsUSF4Library
 {
-    public class EMAProcessor
+    public class EMAProcessor : IAnimationProcessor
     {
-        public float CurrentFrame { get; private set; }
-        public int CurrentAnimationIndex { get; private set; }
+        private float _currentFrame = 0;
+        private int _currentAnimationIndex = 0;
+        public float CurrentFrame
+        {
+            get { return _currentFrame; }
+            set
+            {
+                //SetupFrame(value);
+                value = value % Ema.Animations[CurrentAnimationIndex].Duration;
+                _currentFrame = value;
+                AnimateFrame(value);
+
+            }
+        }
+        public int CurrentAnimationIndex
+        {
+            get { return _currentAnimationIndex; }
+            set
+            {
+                SetupAnimation(value);
+            }
+        }
         public int CurrentFaceIndex { get; private set; }
         public EMA Ema { get; private set; }
         public EMA FaceEma { get; private set; }
@@ -32,9 +52,6 @@ namespace JJsUSF4Library
         public EMAProcessor(EMA animatedEma, EMA faceEma, EMO skinnedEmo = default)
         {
             FaceEma = new EMA();
-            CurrentFrame = 0;
-            CurrentAnimationIndex = 0;
-            CurrentFaceIndex = 0;
 
             //Deep copy of faceEma
             FaceEma.ReadFromStream(new System.IO.BinaryReader(new System.IO.MemoryStream(faceEma.GenerateBytes())));
@@ -53,7 +70,11 @@ namespace JJsUSF4Library
             AnimatedSkeleton = new AnimatedSkeleton(Ema.Skeleton);
             AnimatedNodes = AnimatedSkeleton.AnimatedNodes.ToArray();
             SetupRestPose();
-            SetupAnimation(0);
+
+            CurrentFaceIndex = 0;
+            _currentAnimationIndex = 0;
+            _currentFrame = 0;
+            //SetupAnimation(0);
         }
 
         public AnimatedNode[] ReturnAnimatedNodes()
@@ -95,19 +116,22 @@ namespace JJsUSF4Library
             }
         }
 
-        public bool SetupAnimation(int animationIndex)
+        public Matrix4x4 GetAnimatedLocalMatrixByNodeName(string nodeName)
         {
-            CurrentFrame = 0;
-            CurrentAnimationIndex = animationIndex;
-
-            return true;
+            return AnimatedNodes.Where(n => n.Name == nodeName).FirstOrDefault().AnimatedLocalMatrix;
         }
 
-        public void AnimateFrame(float frame)
+        private void SetupAnimation(int animationIndex)
+        {
+            _currentFrame = 0;
+            _currentAnimationIndex = animationIndex;
+        }
+
+        private void AnimateFrame(float frame)
         {
             //Lock the frame within the duration
-            CurrentFrame = frame % Ema.Animations[CurrentAnimationIndex].Duration;
-            SetupFrame(CurrentFrame);
+            //CurrentFrame = frame % Ema.Animations[CurrentAnimationIndex].Duration;
+            SetupFrame(frame);
 
             for (int i = 0; i < AnimatedNodes.Length; i++)
             {
@@ -122,45 +146,45 @@ namespace JJsUSF4Library
 
         }
 
-        public void SetupFrame(float frame)
+        private void SetupFrame(float frame)
         {
             //Reset all the nodes, and calculate their transforms
             for (int i = 0; i < AnimatedNodes.Length; i++)
             {
                 //Reset flags
                 AnimatedNodes[i].AnimationProcessingDone = false;
-                AnimatedNodes[i].animatedAbsoluteRotationFlag = false;
-                AnimatedNodes[i].animatedAbsoluteScaleFlag = false;
-                AnimatedNodes[i].animatedAbsoluteTranslationFlag = false;
+                AnimatedNodes[i].AnimatedAbsoluteRotationFlag = false;
+                AnimatedNodes[i].AnimatedAbsoluteScaleFlag = false;
+                AnimatedNodes[i].AnimatedAbsoluteTranslationFlag = false;
                 //Reset transformation
-                AnimatedNodes[i].animatedRotation = AnimatedNodes[i].Rotation;
+                AnimatedNodes[i].AnimatedRotation = AnimatedNodes[i].Rotation;
                 AnimatedNodes[i].AnimatedScale = AnimatedNodes[i].Scale;
                 AnimatedNodes[i].AnimatedTranslation = AnimatedNodes[i].Translation;
-                AnimatedNodes[i].animatedRotationQuaternion = AnimatedNodes[i].RotationQuaternion;
+                AnimatedNodes[i].AnimatedRotationQuaternion = AnimatedNodes[i].RotationQuaternion;
                 AnimatedNodes[i].AnimatedMatrix = AnimatedNodes[i].TransformMatrix;
 
                 //Calculate interpolated values, if the node is animated
-                if (getTransform(CurrentAnimationIndex, CurrentFrame, AnimatedNodes[i].ID, 0, out Vector3 translation, out bool absoluteTranslation))
+                if (getTransform(_currentAnimationIndex, _currentFrame, AnimatedNodes[i].ID, 0, out Vector3 translation, out bool absoluteTranslation))
                 {
-                    AnimatedNodes[i].animatedAbsoluteTranslationFlag = absoluteTranslation;
+                    AnimatedNodes[i].AnimatedAbsoluteTranslationFlag = absoluteTranslation;
                     AnimatedNodes[i].AnimatedTranslation = translation;
 
                 }
-                if (getTransform(CurrentAnimationIndex, CurrentFrame, AnimatedNodes[i].ID, 1, out Vector3 rotation_d, out bool absoluteRotation))
+                if (getTransform(_currentAnimationIndex, _currentFrame, AnimatedNodes[i].ID, 1, out Vector3 rotation_d, out bool absoluteRotation))
                 {
                     //aNodes_array[i].animatedRotation = new Vector3((float)(rotation_d.X * Math.PI / 180d), (float)(rotation_d.Y * Math.PI / 180d), (float)(rotation_d.Z * Math.PI / 180d));
-                    AnimatedNodes[i].animatedAbsoluteRotationFlag = absoluteRotation;
-                    AnimatedNodes[i].animatedRotation = new Vector3(rotation_d.X, rotation_d.Y, rotation_d.Z);
+                    AnimatedNodes[i].AnimatedAbsoluteRotationFlag = absoluteRotation;
+                    AnimatedNodes[i].AnimatedRotation = new Vector3(rotation_d.X, rotation_d.Y, rotation_d.Z);
                     EMAProcessorUtils.EulerToQuaternionXYZ((float)(rotation_d.Y * Math.PI / 180d), (float)(rotation_d.Z * Math.PI / 180d), (float)(rotation_d.X * Math.PI / 180d), out Quaternion quaternion);
-                    AnimatedNodes[i].animatedRotationQuaternion = quaternion;
+                    AnimatedNodes[i].AnimatedRotationQuaternion = quaternion;
                 }
-                if (getTransform(CurrentAnimationIndex, CurrentFrame, AnimatedNodes[i].ID, 2, out Vector3 scale, out bool absoluteScale))
+                if (getTransform(_currentAnimationIndex, _currentFrame, AnimatedNodes[i].ID, 2, out Vector3 scale, out bool absoluteScale))
                 {
-                    AnimatedNodes[i].animatedAbsoluteScaleFlag = absoluteScale;
+                    AnimatedNodes[i].AnimatedAbsoluteScaleFlag = absoluteScale;
                     AnimatedNodes[i].AnimatedScale = scale;
                 }
 
-                AnimatedNodes[i].AnimatedMatrix = Matrix4x4.CreateScale(AnimatedNodes[i].AnimatedScale) * Matrix4x4.CreateFromQuaternion(AnimatedNodes[i].animatedRotationQuaternion) * Matrix4x4.CreateTranslation(AnimatedNodes[i].AnimatedTranslation);
+                AnimatedNodes[i].AnimatedMatrix = Matrix4x4.CreateScale(AnimatedNodes[i].AnimatedScale) * Matrix4x4.CreateFromQuaternion(AnimatedNodes[i].AnimatedRotationQuaternion) * Matrix4x4.CreateTranslation(AnimatedNodes[i].AnimatedTranslation);
             }
         }
 
@@ -174,7 +198,7 @@ namespace JJsUSF4Library
             int coreTracks = Ema.Animations[CurrentAnimationIndex].CMDTracks.Count;
 
             List<CMDTrack> tracks = Ema.Animations[CurrentAnimationIndex].CMDTracks.Select(x => x).ToList();
-            tracks.AddRange(FaceEma.Animations[0].CMDTracks);
+            tracks.AddRange(FaceEma.Animations[CurrentFaceIndex].CMDTracks);
             //_currentTracks = tracks;
 
             foreach (CMDTrack c in tracks.Where(x => x.BoneID == bone_index && x.TransformType == transform_type))
@@ -214,38 +238,40 @@ namespace JJsUSF4Library
 
                 //Reset flags
                 node.AnimationProcessingDone = false;
-                node.animatedAbsoluteRotationFlag = false;
-                node.animatedAbsoluteScaleFlag = false;
-                node.animatedAbsoluteTranslationFlag = false;
+                node.AnimatedAbsoluteRotationFlag = false;
+                node.AnimatedAbsoluteScaleFlag = false;
+                node.AnimatedAbsoluteTranslationFlag = false;
                 //Reset transformation
-                node.animatedRotation = node.Rotation;
+                node.AnimatedRotation = node.Rotation;
                 node.AnimatedScale = node.Scale;
                 node.AnimatedTranslation = node.Translation;
-                node.animatedRotationQuaternion = node.RotationQuaternion;
-                node.AnimatedMatrix = node.TransformMatrix;
 
+                Quaternion quaternion = node.RotationQuaternion;
+                Vector3 trans = node.Translation;
+                node.AnimatedRotationQuaternion = quaternion;
+                node.AnimatedMatrix = node.TransformMatrix;
                 //Calculate interpolated values, if the node is animated
-                if (getTransform(CurrentAnimationIndex, CurrentFrame, node.ID, 0, out Vector3 trns, out bool absoluteTranslation))
+                if (getTransform(_currentAnimationIndex, _currentFrame, node.ID, 0, out trans, out bool absoluteTranslation))
                 {
-                    node.animatedAbsoluteTranslationFlag = absoluteTranslation;
-                    node.AnimatedTranslation = trns;
+                    node.AnimatedAbsoluteTranslationFlag = absoluteTranslation;
+                    node.AnimatedTranslation = trans;
 
                 }
-                if (getTransform(CurrentAnimationIndex, CurrentFrame, node.ID, 1, out Vector3 rotation_d, out bool absoluteRotation))
+                if (getTransform(_currentAnimationIndex, _currentFrame, node.ID, 1, out Vector3 rotation_d, out bool absoluteRotation))
                 {
                     //aNodes_array[i].animatedRotation = new Vector3((float)(rotation_d.X * Math.PI / 180d), (float)(rotation_d.Y * Math.PI / 180d), (float)(rotation_d.Z * Math.PI / 180d));
-                    node.animatedAbsoluteRotationFlag = absoluteRotation;
-                    node.animatedRotation = new Vector3(rotation_d.X, rotation_d.Y, rotation_d.Z);
-                    EMAProcessorUtils.EulerToQuaternionXYZ((float)(rotation_d.Y * Math.PI / 180d), (float)(rotation_d.Z * Math.PI / 180d), (float)(rotation_d.X * Math.PI / 180d), out Quaternion quaternion);
-                    node.animatedRotationQuaternion = quaternion;
+                    node.AnimatedAbsoluteRotationFlag = absoluteRotation;
+                    node.AnimatedRotation = new Vector3(rotation_d.X, rotation_d.Y, rotation_d.Z);
+                    EMAProcessorUtils.EulerToQuaternionXYZ((float)(rotation_d.Y * Math.PI / 180d), (float)(rotation_d.Z * Math.PI / 180d), (float)(rotation_d.X * Math.PI / 180d), out quaternion);
+                    node.AnimatedRotationQuaternion = quaternion;
                 }
-                if (getTransform(CurrentAnimationIndex, CurrentFrame, node.ID, 2, out Vector3 scl, out bool absoluteScale))
+                if (getTransform(_currentAnimationIndex, _currentFrame, node.ID, 2, out Vector3 scl, out bool absoluteScale))
                 {
-                    node.animatedAbsoluteScaleFlag = absoluteScale;
+                    node.AnimatedAbsoluteScaleFlag = absoluteScale;
                     node.AnimatedScale = scl;
                 }
 
-                node.AnimatedMatrix = Matrix4x4.CreateScale(node.AnimatedScale) * Matrix4x4.CreateFromQuaternion(node.animatedRotationQuaternion) * Matrix4x4.CreateTranslation(node.AnimatedTranslation);
+                node.AnimatedMatrix = Matrix4x4.CreateScale(scl) * Matrix4x4.CreateFromQuaternion(quaternion) * Matrix4x4.CreateTranslation(trans);
 
             }
 
@@ -268,7 +294,7 @@ namespace JJsUSF4Library
             Matrix4x4 matrix = node.AnimatedMatrix;
             Vector3 translation = node.AnimatedTranslation;
             Vector3 scale = node.AnimatedScale;
-            Quaternion rotation = node.animatedRotationQuaternion;
+            Quaternion rotation = node.AnimatedRotationQuaternion;
 
             if (node.Parent != string.Empty)
             {
@@ -282,17 +308,17 @@ namespace JJsUSF4Library
 
                 Matrix4x4 parentMatrix = parent.AnimatedMatrix;
 
-                if (!node.animatedAbsoluteTranslationFlag)
+                if (!node.AnimatedAbsoluteTranslationFlag)
                 {
                     translation = Vector3.Transform(translation, parent.AnimatedMatrix);
                 }
 
-                if (!node.animatedAbsoluteRotationFlag)
+                if (!node.AnimatedAbsoluteRotationFlag)
                 {
-                    rotation = parent.animatedRotationQuaternion * rotation;
+                    rotation = parent.AnimatedRotationQuaternion * rotation;
                 }
 
-                if (!node.animatedAbsoluteScaleFlag)
+                if (!node.AnimatedAbsoluteScaleFlag)
                 {
                     scale.X *= parent.AnimatedScale.X;
                     scale.Y *= parent.AnimatedScale.Y;
@@ -303,13 +329,13 @@ namespace JJsUSF4Library
 
                 node.AnimatedScale = scale;
                 node.AnimatedTranslation = translation;
-                node.animatedRotationQuaternion = rotation;
+                node.AnimatedRotationQuaternion = rotation;
                 node.AnimatedMatrix = matrix;
 
                 if (node.Parent != string.Empty)
                 {
                     Matrix4x4.Invert(parent.AnimatedMatrix, out Matrix4x4 parentInverseMatrix);
-                    node.animatedLocalMatrix = matrix * parentInverseMatrix;
+                    node.AnimatedLocalMatrix = matrix * parentInverseMatrix;
                 }
 
                 node.AnimationProcessingDone = true;
@@ -658,25 +684,25 @@ namespace JJsUSF4Library
                 // update position and quaternion information for bone index 0x08
                 Quaternion rotation = Quaternion.CreateFromRotationMatrix(var_80);
                 EMAProcessorUtils.LeftHandToEulerAnglesXYZ(var_80, out Vector3 eulerRotation1);
-                node1.animatedRotation = eulerRotation1;
+                node1.AnimatedRotation = eulerRotation1;
 
                 node1.AnimatedTranslation = mat_bone0x08.Translation;
-                node1.animatedRotationQuaternion = rotation;
+                node1.AnimatedRotationQuaternion = rotation;
                 node1.AnimatedMatrix = mat_bone0x08;
 
                 // update position and quaternion information for bone index 0x0A
                 rotation = Quaternion.CreateFromRotationMatrix(var_40);
                 EMAProcessorUtils.LeftHandToEulerAnglesXYZ(var_40, out Vector3 eulerRotation2);
-                node2.animatedRotation = eulerRotation2;
+                node2.AnimatedRotation = eulerRotation2;
 
                 node2.AnimatedTranslation = mat_bone0x0A.Translation;
-                node2.animatedRotationQuaternion = rotation;
+                node2.AnimatedRotationQuaternion = rotation;
                 node2.AnimatedMatrix = mat_bone0x0A;
 
                 // set flags for absolute translation and rotation
                 node2.AnimationProcessingDone = true;
-                node2.animatedAbsoluteRotationFlag = true;
-                node2.animatedAbsoluteTranslationFlag = true;
+                node2.AnimatedAbsoluteRotationFlag = true;
+                node2.AnimatedAbsoluteTranslationFlag = true;
 
                 // update position for bone index 0x0C
                 node3.AnimatedTranslation = new Vector3(var_100.X, var_100.Y, var_100.Z);
@@ -685,7 +711,7 @@ namespace JJsUSF4Library
                 node3.AnimatedMatrix = m;
 
                 // set flags for absolute translation
-                node2.animatedAbsoluteTranslationFlag = true;
+                node2.AnimatedAbsoluteTranslationFlag = true;
 
                 //UpdateNode(aNodes_array[ema.Skeleton.NodeNames.IndexOf(node1.Child1)], true, true, false);
                 UpdateNode(AnimatedNodes[Ema.Skeleton.NodeNames.IndexOf(node2.Child1)], true, true, true);
@@ -734,12 +760,12 @@ namespace JJsUSF4Library
                 // if flags & 0x02
                 if ((ik.Flag0x01 & 0x02) == 0x02)
                 {
-                    rotation = lerpQuaternion(node1.animatedRotationQuaternion, node2.animatedRotationQuaternion, ik.IKFloats[1]);
+                    rotation = lerpQuaternion(node1.AnimatedRotationQuaternion, node2.AnimatedRotationQuaternion, ik.IKFloats[1]);
                 }
                 else
                 {
                     //rotation = node0.animatedRotationQuaternion * nodeP.animatedRotationQuaternion;
-                    rotation = node0.animatedRotationQuaternion;
+                    rotation = node0.AnimatedRotationQuaternion;
                 }
                 Vector3 scale;
                 //if flags & 0x04
@@ -758,18 +784,18 @@ namespace JJsUSF4Library
 
                 AnimatedNodes[node0.ID].AnimatedScale = scale;
                 AnimatedNodes[node0.ID].AnimatedTranslation = translation;
-                AnimatedNodes[node0.ID].animatedRotationQuaternion = rotation;
+                AnimatedNodes[node0.ID].AnimatedRotationQuaternion = rotation;
                 AnimatedNodes[node0.ID].AnimatedMatrix = matrix;
 
                 AnimatedNodes[node0.ID].AnimationProcessingDone = true;
-                AnimatedNodes[node0.ID].animatedAbsoluteRotationFlag = true;
-                AnimatedNodes[node0.ID].animatedAbsoluteTranslationFlag = true;
-                AnimatedNodes[node0.ID].animatedAbsoluteScaleFlag = true;
+                AnimatedNodes[node0.ID].AnimatedAbsoluteRotationFlag = true;
+                AnimatedNodes[node0.ID].AnimatedAbsoluteTranslationFlag = true;
+                AnimatedNodes[node0.ID].AnimatedAbsoluteScaleFlag = true;
 
                 if (node0.Parent != string.Empty)
                 {
                     Matrix4x4.Invert(AnimatedNodes[AnimatedSkeleton.NodeNames.IndexOf(node0.Parent)].AnimatedMatrix, out Matrix4x4 parentInverseMatrix);
-                    node0.animatedLocalMatrix = matrix * parentInverseMatrix;
+                    node0.AnimatedLocalMatrix = matrix * parentInverseMatrix;
                 }
 
                 int node0Child = Ema.Skeleton.NodeNames.IndexOf(node0.Child1);
@@ -777,16 +803,16 @@ namespace JJsUSF4Library
                 {
                     UpdateNode(AnimatedNodes[node0Child], true, true, true);
                 }
-                //int node1Child = Ema.Skeleton.NodeNames.IndexOf(node1.Child1);
-                //if (node1Child >= 0 && node1Child < AnimatedNodes.Count())
-                //{
-                //    UpdateNode(AnimatedNodes[Ema.Skeleton.NodeNames.IndexOf(node1.Child1)], true, true, true);
-                //}
-                //int node2Child = Ema.Skeleton.NodeNames.IndexOf(node2.Child1);
-                //if (node2Child >= 0 && node2Child < AnimatedNodes.Count())
-                //{
-                //    UpdateNode(AnimatedNodes[Ema.Skeleton.NodeNames.IndexOf(node2.Child1)], true, true, true);
-                //}
+                int node1Child = Ema.Skeleton.NodeNames.IndexOf(node1.Child1);
+                if (node1Child >= 0 && node1Child < AnimatedNodes.Count())
+                {
+                    UpdateNode(AnimatedNodes[Ema.Skeleton.NodeNames.IndexOf(node1.Child1)], true, true, true);
+                }
+                int node2Child = Ema.Skeleton.NodeNames.IndexOf(node2.Child1);
+                if (node2Child >= 0 && node2Child < AnimatedNodes.Count())
+                {
+                    UpdateNode(AnimatedNodes[Ema.Skeleton.NodeNames.IndexOf(node2.Child1)], true, true, true);
+                }
             }
         }
 

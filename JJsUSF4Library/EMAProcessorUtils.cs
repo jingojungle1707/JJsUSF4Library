@@ -55,6 +55,50 @@ namespace JJsUSF4Library
             sz = scale.Z;
         }
 
+        public static void DecomposeMatrixTRS(Matrix4x4 matrix, out float tx, out float ty, out float tz, out float rx, out float ry, out float rz, out float sx, out float sy, out float sz)
+        {
+            //In matrix from Blender, we're using SRT transformations
+            //We need our compenent transformations to work in a TRS system
+            //Let's ignore scale for a sec
+            //So in our Blender-matrix, our Translation is provided in a rotated space
+            //Our rotation is incorrect, because it assumed a rotation around the parent node
+            //However, we need a rotation in the translated space
+
+            Vector3 scale;
+            Quaternion quatrotation;
+            Vector3 translation;
+
+            //Decompose the matrix into SRT-style components
+            Matrix4x4.Decompose(matrix, out scale, out quatrotation, out translation);
+
+            //We need to multiply the resulting translation by the inverse rotation matrix to get a translation in parent-space
+            Matrix4x4.Invert(Matrix4x4.CreateFromQuaternion(quatrotation), out Matrix4x4 inverseRotation);
+            translation = Matrix4x4.Multiply(inverseRotation, Matrix4x4.CreateTranslation(translation)).Translation;
+
+
+            LeftHandToEulerAnglesXYZ(Matrix4x4.Transpose(matrix), out rx, out ry, out rz);
+
+            tx = translation.X;
+            ty = translation.Y;
+            tz = translation.Z;
+
+            //rx = 0;
+            //ry = 0;
+            //rz = 0;
+
+            sx = 1; 
+            sy = 1; 
+            sz = 1;
+
+            rx *= (float)(180 / Math.PI);
+            ry *= (float)(180 / Math.PI);
+            rz *= (float)(180 / Math.PI);
+
+            //sx = scale.X;
+            //sy = scale.Y;
+            //sz = scale.Z;
+        }
+
         public static void LeftHandToEulerAnglesXYZ(Matrix4x4 m, out float rfXAngle, out float rfYAngle, out float rfZAngle)
         {
             // +-           -+   +-                                      -+
